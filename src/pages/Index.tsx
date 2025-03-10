@@ -39,7 +39,7 @@ const Index = () => {
           <div className="glass-effect rounded-xl p-6 mb-6 text-center animate-fade-in">
             <h2 className="text-2xl font-bold mb-2">Create Your Fake Betslip</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Customize every detail of your betting slip to share with friends. Switch between bookmakers to create different styled betslips. This is for entertainment purposes only.
+              Customize every detail of your betting slip to share with friends. This is for entertainment purposes only.
             </p>
           </div>
           
@@ -51,7 +51,7 @@ const Index = () => {
           <Separator className="my-10" />
           
           <div className="text-center text-gray-500 text-sm animate-fade-in">
-            <p className="mb-2">This tool is for entertainment purposes only. Not affiliated with bet365, DraftKings, or BetMGM.</p>
+            <p className="mb-2">This tool is for entertainment purposes only. Not affiliated with bet365.</p>
             <p>Created with ❤️ using React, Tailwind CSS and shadcn/ui.</p>
           </div>
         </div>

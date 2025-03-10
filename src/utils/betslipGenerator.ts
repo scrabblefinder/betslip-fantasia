@@ -8,29 +8,11 @@ export const formatDate = (date: Date): string => {
   });
 };
 
-// Format date for BetMGM style (M/D/YY)
-export const formatDateBetMGM = (date: Date): string => {
-  return date.toLocaleDateString('en-US', {
-    month: 'numeric',
-    day: 'numeric',
-    year: '2-digit'
-  });
-};
-
 // Format time to display in betslip
 export const formatTime = (date: Date): string => {
   return date.toLocaleTimeString('en-GB', {
     hour: '2-digit',
     minute: '2-digit'
-  });
-};
-
-// Format time for BetMGM style (H:MM AM/PM)
-export const formatTimeBetMGM = (date: Date): string => {
-  return date.toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true
   });
 };
 
@@ -52,8 +34,7 @@ export const calculateReturns = (stake: number, odds: number): number => {
 // Format currency 
 export const formatCurrency = (amount: number, currency: string = "GBP"): string => {
   const currencyMap: Record<string, string> = {
-    "GBP": "GBP",
-    "USD": "USD"
+    "GBP": "GBP"
   };
   
   return new Intl.NumberFormat('en-GB', {
@@ -74,7 +55,7 @@ export interface BetSelection {
   eventDate: Date;
 }
 
-export type Bookmaker = 'bet365' | 'draftkings' | 'betmgm';
+export type Bookmaker = 'bet365';
 
 export interface BetslipData {
   selections: BetSelection[];
@@ -219,24 +200,6 @@ export const downloadBetslip = async (elementId: string, filename: string): Prom
       if (element.classList.contains('text-bet365-green')) {
         element.style.color = 'rgb(30, 126, 52)';
       }
-      
-      // Handle DraftKings elements
-      if (element.classList.contains('dk-betslip')) {
-        element.style.backgroundColor = 'rgb(26, 26, 26)';
-      }
-      
-      if (element.classList.contains('text-dk-blue')) {
-        element.style.color = 'rgb(0, 221, 0)';
-      }
-      
-      if (element.classList.contains('dk-check-icon')) {
-        element.style.backgroundColor = 'rgb(0, 221, 0)';
-      }
-      
-      // Handle BetMGM specific elements
-      if (element.classList.contains('mgm-betslip-header')) {
-        element.style.backgroundColor = 'rgb(245, 245, 245)';
-      }
     });
     
     // Append the clone to the body temporarily
@@ -356,24 +319,6 @@ export const shareBetslip = async (elementId: string, title: string): Promise<vo
       
       if (element.classList.contains('text-bet365-green')) {
         element.style.color = 'rgb(30, 126, 52)';
-      }
-      
-      // Handle DraftKings elements
-      if (element.classList.contains('dk-betslip')) {
-        element.style.backgroundColor = 'rgb(26, 26, 26)';
-      }
-      
-      if (element.classList.contains('text-dk-blue')) {
-        element.style.color = 'rgb(0, 221, 0)';
-      }
-      
-      if (element.classList.contains('dk-check-icon')) {
-        element.style.backgroundColor = 'rgb(0, 221, 0)';
-      }
-      
-      // Handle BetMGM specific elements
-      if (element.classList.contains('mgm-betslip-header')) {
-        element.style.backgroundColor = 'rgb(245, 245, 245)';
       }
     });
     
