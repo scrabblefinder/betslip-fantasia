@@ -66,7 +66,9 @@ const BetslipPreview: React.FC<BetslipPreviewProps> = ({ betslip }) => {
             </div>
           </div>
           
-          <CustomBetslipPreview betslip={betslip} totalOdds={totalOdds} totalReturns={totalReturns} />
+          <div className="bg-white">
+            <CustomBetslipPreview betslip={betslip} totalOdds={totalOdds} totalReturns={totalReturns} />
+          </div>
         </CardContent>
       </Card>
     </div>
@@ -83,7 +85,7 @@ const CustomBetslipPreview: React.FC<BetslipContentProps> = ({ betslip, totalOdd
   const bookmakerName = getBookmakerDisplayName(betslip);
   
   return (
-    <div id="betslip-preview" className="betslip">
+    <div id="betslip-preview" className="betslip bg-white p-4">
       <div className="betslip-header">
         <div className="flex items-center">
           <span className="text-xl font-bold">{bookmakerName}</span>
