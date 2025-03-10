@@ -48,13 +48,14 @@ export interface BetSelection {
   homeTeam: string;
   awayTeam: string;
   market: string;
-  customMarket?: string; // New field for custom market text
+  customMarket?: string; // Field for custom market text
   selection: string;
   odds: number;
   eventDate: Date;
 }
 
-export type Bookmaker = 'bet365' | 'custom';
+// Update Bookmaker type to only have 'custom'
+export type Bookmaker = 'custom';
 
 export interface BetslipData {
   selections: BetSelection[];
@@ -63,7 +64,7 @@ export interface BetslipData {
   placedAt: Date;
   receiptNumber: string;
   bookmaker: Bookmaker;
-  customBookmakerName?: string; // New field for custom bookmaker name
+  customBookmakerName: string; // No longer optional
   currency: string;
 }
 
@@ -75,7 +76,8 @@ export const createBlankBetslip = (): BetslipData => {
     betType: 'single',
     placedAt: new Date(),
     receiptNumber: generateReceiptNumber(),
-    bookmaker: 'bet365',
+    bookmaker: 'custom',
+    customBookmakerName: 'Your Bookmaker', // Default name
     currency: 'GBP'
   };
 };
@@ -116,11 +118,9 @@ export const getMarketDisplayText = (selection: BetSelection): string => {
     : selection.market;
 };
 
-// Get the display bookmaker name (use custom bookmaker if available)
+// Get the display bookmaker name
 export const getBookmakerDisplayName = (betslip: BetslipData): string => {
-  return betslip.bookmaker === 'custom' && betslip.customBookmakerName 
-    ? betslip.customBookmakerName 
-    : 'bet365';
+  return betslip.customBookmakerName || 'Your Bookmaker';
 };
 
 // Calculate total odds for accumulator

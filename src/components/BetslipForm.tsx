@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -98,29 +97,14 @@ const BetslipForm: React.FC<BetslipFormProps> = ({ betslip, onBetslipChange }) =
         </div>
 
         <div className="mb-4">
-          <Label htmlFor="bookmaker" className="text-sm font-medium">Bookmaker</Label>
-          <Select value={betslip.bookmaker} onValueChange={(value) => handleBookmakerChange(value as Bookmaker)}>
-            <SelectTrigger id="bookmaker">
-              <SelectValue placeholder="Select Bookmaker" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="bet365">bet365</SelectItem>
-              <SelectItem value="custom">Custom</SelectItem>
-            </SelectContent>
-          </Select>
-          
-          {betslip.bookmaker === 'custom' && (
-            <div className="mt-2">
-              <Label htmlFor="custom-bookmaker" className="text-sm font-medium">Custom Bookmaker Name</Label>
-              <Input
-                id="custom-bookmaker"
-                value={betslip.customBookmakerName || ''}
-                onChange={(e) => handleCustomBookmakerNameChange(e.target.value)}
-                placeholder="Enter bookmaker name"
-                className="mt-1"
-              />
-            </div>
-          )}
+          <Label htmlFor="custom-bookmaker" className="text-sm font-medium">Bookmaker Name</Label>
+          <Input
+            id="custom-bookmaker"
+            value={betslip.customBookmakerName}
+            onChange={(e) => handleCustomBookmakerNameChange(e.target.value)}
+            placeholder="Enter bookmaker name"
+            className="mt-1"
+          />
         </div>
 
         <Tabs defaultValue="matches" value={activeTab} onValueChange={setActiveTab}>

@@ -26,7 +26,7 @@ const BetslipPreview: React.FC<BetslipPreviewProps> = ({ betslip }) => {
   const totalReturns = calculateReturns(betslip.stake, totalOdds);
   
   const handleDownload = async () => {
-    await downloadBetslip('betslip-preview', `${betslip.bookmaker === 'custom' ? 'custom' : betslip.bookmaker}-${betslip.receiptNumber}.png`);
+    await downloadBetslip('betslip-preview', `${betslip.customBookmakerName}-${betslip.receiptNumber}.png`);
   };
   
   const handleShare = async () => {
@@ -66,7 +66,7 @@ const BetslipPreview: React.FC<BetslipPreviewProps> = ({ betslip }) => {
             </div>
           </div>
           
-          <Bet365BetslipPreview betslip={betslip} totalOdds={totalOdds} totalReturns={totalReturns} />
+          <CustomBetslipPreview betslip={betslip} totalOdds={totalOdds} totalReturns={totalReturns} />
         </CardContent>
       </Card>
     </div>
@@ -79,7 +79,8 @@ interface BetslipContentProps {
   totalReturns: number;
 }
 
-const Bet365BetslipPreview: React.FC<BetslipContentProps> = ({ betslip, totalOdds, totalReturns }) => {
+// Renamed from Bet365BetslipPreview to CustomBetslipPreview
+const CustomBetslipPreview: React.FC<BetslipContentProps> = ({ betslip, totalOdds, totalReturns }) => {
   const bookmakerName = getBookmakerDisplayName(betslip);
   
   return (
