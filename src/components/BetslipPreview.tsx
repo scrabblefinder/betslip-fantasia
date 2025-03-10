@@ -189,7 +189,8 @@ const CustomBetslipPreview: React.FC<BetslipContentProps> = ({ betslip, totalOdd
       <div className="betslip-footer mt-4">
         <div className="text-xs text-center text-gray-500">
           <p>This is a simulated betslip for entertainment purposes only.</p>
-          <p>Not affiliated with {bookmakerName}. Generated at Betslip.fyi</p>
+          <p>Not affiliated with {bookmakerName}.</p>
+          <p className="mt-1">Generated at Betslip.fyi</p>
         </div>
       </div>
     </div>
