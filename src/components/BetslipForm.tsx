@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,12 +26,12 @@ interface BetslipFormProps {
 const BetslipForm: React.FC<BetslipFormProps> = ({ betslip, onBetslipChange }) => {
   const [activeTab, setActiveTab] = useState<string>("matches");
 
-  // Add useEffect to handle automatic bet type changes based on number of selections
+  // Update useEffect to handle simplified bet type changes (Single/Multiple)
   useEffect(() => {
     if (betslip.selections.length > 1 && betslip.betType === 'single') {
-      const newBetType = betslip.selections.length === 2 ? 'double' : 
-                        betslip.selections.length === 3 ? 'treble' : 'accumulator';
-      onBetslipChange({...betslip, betType: newBetType});
+      onBetslipChange({...betslip, betType: 'multiple'});
+    } else if (betslip.selections.length === 1 && betslip.betType === 'multiple') {
+      onBetslipChange({...betslip, betType: 'single'});
     }
   }, [betslip.selections.length]);
 
@@ -301,9 +302,7 @@ const BetslipForm: React.FC<BetslipFormProps> = ({ betslip, onBetslipChange }) =
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="single">Single</SelectItem>
-                    <SelectItem value="double">Double</SelectItem>
-                    <SelectItem value="treble">Treble</SelectItem>
-                    <SelectItem value="accumulator">Accumulator</SelectItem>
+                    <SelectItem value="multiple">Multiple</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
