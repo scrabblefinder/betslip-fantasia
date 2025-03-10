@@ -66,7 +66,7 @@ const BetslipForm: React.FC<BetslipFormProps> = ({ betslip, onBetslipChange }) =
 
   const handleBookmakerChange = (bookmaker: Bookmaker) => {
     // Set default currency based on bookmaker
-    const currency = bookmaker === 'draftkings' ? 'USD' : 'GBP';
+    const currency = bookmaker === 'bet365' ? 'GBP' : 'USD';
     
     onBetslipChange({
       ...betslip,
@@ -100,6 +100,7 @@ const BetslipForm: React.FC<BetslipFormProps> = ({ betslip, onBetslipChange }) =
             <SelectContent>
               <SelectItem value="bet365">bet365</SelectItem>
               <SelectItem value="draftkings">DraftKings</SelectItem>
+              <SelectItem value="betmgm">BetMGM</SelectItem>
             </SelectContent>
           </Select>
         </div>

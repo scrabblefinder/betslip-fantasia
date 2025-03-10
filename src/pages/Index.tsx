@@ -51,7 +51,7 @@ const Index = () => {
           <Separator className="my-10" />
           
           <div className="text-center text-gray-500 text-sm animate-fade-in">
-            <p className="mb-2">This tool is for entertainment purposes only. Not affiliated with bet365 or DraftKings.</p>
+            <p className="mb-2">This tool is for entertainment purposes only. Not affiliated with bet365, DraftKings, or BetMGM.</p>
             <p>Created with ❤️ using React, Tailwind CSS and shadcn/ui.</p>
           </div>
         </div>

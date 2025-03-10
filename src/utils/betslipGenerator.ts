@@ -8,11 +8,29 @@ export const formatDate = (date: Date): string => {
   });
 };
 
+// Format date for BetMGM style (M/D/YY)
+export const formatDateBetMGM = (date: Date): string => {
+  return date.toLocaleDateString('en-US', {
+    month: 'numeric',
+    day: 'numeric',
+    year: '2-digit'
+  });
+};
+
 // Format time to display in betslip
 export const formatTime = (date: Date): string => {
   return date.toLocaleTimeString('en-GB', {
     hour: '2-digit',
     minute: '2-digit'
+  });
+};
+
+// Format time for BetMGM style (H:MM AM/PM)
+export const formatTimeBetMGM = (date: Date): string => {
+  return date.toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
   });
 };
 
@@ -56,7 +74,7 @@ export interface BetSelection {
   eventDate: Date;
 }
 
-export type Bookmaker = 'bet365' | 'draftkings';
+export type Bookmaker = 'bet365' | 'draftkings' | 'betmgm';
 
 export interface BetslipData {
   selections: BetSelection[];
