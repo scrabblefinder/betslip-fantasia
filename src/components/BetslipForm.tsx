@@ -68,7 +68,16 @@ const BetslipForm: React.FC<BetslipFormProps> = ({ betslip, onBetslipChange }) =
     onBetslipChange({
       ...betslip,
       bookmaker,
-      currency: 'GBP'
+      currency: 'GBP',
+      // Clear the custom name if switching back to bet365
+      customBookmakerName: bookmaker === 'bet365' ? undefined : betslip.customBookmakerName
+    });
+  };
+
+  const handleCustomBookmakerNameChange = (name: string) => {
+    onBetslipChange({
+      ...betslip,
+      customBookmakerName: name
     });
   };
 
@@ -96,8 +105,22 @@ const BetslipForm: React.FC<BetslipFormProps> = ({ betslip, onBetslipChange }) =
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="bet365">bet365</SelectItem>
+              <SelectItem value="custom">Custom</SelectItem>
             </SelectContent>
           </Select>
+          
+          {betslip.bookmaker === 'custom' && (
+            <div className="mt-2">
+              <Label htmlFor="custom-bookmaker" className="text-sm font-medium">Custom Bookmaker Name</Label>
+              <Input
+                id="custom-bookmaker"
+                value={betslip.customBookmakerName || ''}
+                onChange={(e) => handleCustomBookmakerNameChange(e.target.value)}
+                placeholder="Enter bookmaker name"
+                className="mt-1"
+              />
+            </div>
+          )}
         </div>
 
         <Tabs defaultValue="matches" value={activeTab} onValueChange={setActiveTab}>

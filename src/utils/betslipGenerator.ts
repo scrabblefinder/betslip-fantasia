@@ -1,4 +1,3 @@
-
 // Format date to display in betslip
 export const formatDate = (date: Date): string => {
   return date.toLocaleDateString('en-GB', {
@@ -55,7 +54,7 @@ export interface BetSelection {
   eventDate: Date;
 }
 
-export type Bookmaker = 'bet365';
+export type Bookmaker = 'bet365' | 'custom';
 
 export interface BetslipData {
   selections: BetSelection[];
@@ -64,6 +63,7 @@ export interface BetslipData {
   placedAt: Date;
   receiptNumber: string;
   bookmaker: Bookmaker;
+  customBookmakerName?: string; // New field for custom bookmaker name
   currency: string;
 }
 
@@ -114,6 +114,13 @@ export const getMarketDisplayText = (selection: BetSelection): string => {
   return selection.market === 'Custom' && selection.customMarket 
     ? selection.customMarket 
     : selection.market;
+};
+
+// Get the display bookmaker name (use custom bookmaker if available)
+export const getBookmakerDisplayName = (betslip: BetslipData): string => {
+  return betslip.bookmaker === 'custom' && betslip.customBookmakerName 
+    ? betslip.customBookmakerName 
+    : 'bet365';
 };
 
 // Calculate total odds for accumulator

@@ -13,7 +13,8 @@ import {
   calculateTotalOdds,
   downloadBetslip,
   shareBetslip,
-  getMarketDisplayText
+  getMarketDisplayText,
+  getBookmakerDisplayName
 } from "@/utils/betslipGenerator";
 
 interface BetslipPreviewProps {
@@ -25,11 +26,12 @@ const BetslipPreview: React.FC<BetslipPreviewProps> = ({ betslip }) => {
   const totalReturns = calculateReturns(betslip.stake, totalOdds);
   
   const handleDownload = async () => {
-    await downloadBetslip('betslip-preview', `${betslip.bookmaker}-${betslip.receiptNumber}.png`);
+    await downloadBetslip('betslip-preview', `${betslip.bookmaker === 'custom' ? 'custom' : betslip.bookmaker}-${betslip.receiptNumber}.png`);
   };
   
   const handleShare = async () => {
-    await shareBetslip('betslip-preview', `My bet365 Betslip`);
+    const bookmakerName = getBookmakerDisplayName(betslip);
+    await shareBetslip('betslip-preview', `My ${bookmakerName} Betslip`);
   };
 
   const isShareSupported = typeof navigator !== 'undefined' && !!navigator.share;
@@ -78,11 +80,13 @@ interface BetslipContentProps {
 }
 
 const Bet365BetslipPreview: React.FC<BetslipContentProps> = ({ betslip, totalOdds, totalReturns }) => {
+  const bookmakerName = getBookmakerDisplayName(betslip);
+  
   return (
     <div id="betslip-preview" className="betslip">
       <div className="betslip-header">
         <div className="flex items-center">
-          <span className="text-xl font-bold">bet365</span>
+          <span className="text-xl font-bold">{bookmakerName}</span>
         </div>
         <div className="flex flex-col items-end">
           <span className="text-xs opacity-80">Receipt</span>
@@ -147,7 +151,7 @@ const Bet365BetslipPreview: React.FC<BetslipContentProps> = ({ betslip, totalOdd
       <div className="betslip-footer">
         <div className="text-xs text-center text-gray-500">
           <p>This is a simulated betslip for entertainment purposes only.</p>
-          <p>Not affiliated with bet365.</p>
+          <p>Not affiliated with {bookmakerName}.</p>
         </div>
       </div>
     </div>
