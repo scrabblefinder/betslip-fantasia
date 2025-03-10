@@ -32,10 +32,15 @@ export const calculateReturns = (stake: number, odds: number): number => {
 };
 
 // Format currency 
-export const formatCurrency = (amount: number): string => {
+export const formatCurrency = (amount: number, currency: string = "GBP"): string => {
+  const currencyMap: Record<string, string> = {
+    "GBP": "GBP",
+    "USD": "USD"
+  };
+  
   return new Intl.NumberFormat('en-GB', {
     style: 'currency',
-    currency: 'GBP',
+    currency: currencyMap[currency] || "GBP",
     minimumFractionDigits: 2
   }).format(amount);
 };
@@ -51,12 +56,16 @@ export interface BetSelection {
   eventDate: Date;
 }
 
+export type Bookmaker = 'bet365' | 'draftkings';
+
 export interface BetslipData {
   selections: BetSelection[];
   stake: number;
   betType: string; // single, double, accumulator
   placedAt: Date;
   receiptNumber: string;
+  bookmaker: Bookmaker;
+  currency: string;
 }
 
 // Create a blank betslip with default values
@@ -66,7 +75,9 @@ export const createBlankBetslip = (): BetslipData => {
     stake: 10,
     betType: 'single',
     placedAt: new Date(),
-    receiptNumber: generateReceiptNumber()
+    receiptNumber: generateReceiptNumber(),
+    bookmaker: 'bet365',
+    currency: 'GBP'
   };
 };
 

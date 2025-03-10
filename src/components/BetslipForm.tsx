@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Trash, Plus, RefreshCw } from "lucide-react";
-import { BetslipData, BetSelection, addSelection, removeSelection, createBlankBetslip } from "@/utils/betslipGenerator";
+import { BetslipData, BetSelection, Bookmaker, addSelection, removeSelection, createBlankBetslip } from "@/utils/betslipGenerator";
 
 interface BetslipFormProps {
   betslip: BetslipData;
@@ -64,6 +64,17 @@ const BetslipForm: React.FC<BetslipFormProps> = ({ betslip, onBetslipChange }) =
     handleSelectionChange(id, 'eventDate', date);
   };
 
+  const handleBookmakerChange = (bookmaker: Bookmaker) => {
+    // Set default currency based on bookmaker
+    const currency = bookmaker === 'draftkings' ? 'USD' : 'GBP';
+    
+    onBetslipChange({
+      ...betslip,
+      bookmaker,
+      currency
+    });
+  };
+
   return (
     <Card className="w-full max-w-md mx-auto animate-fade-in">
       <CardContent className="p-6">
@@ -78,6 +89,19 @@ const BetslipForm: React.FC<BetslipFormProps> = ({ betslip, onBetslipChange }) =
             <RefreshCw className="h-4 w-4" />
             <span>Reset</span>
           </Button>
+        </div>
+
+        <div className="mb-4">
+          <Label htmlFor="bookmaker" className="text-sm font-medium">Bookmaker</Label>
+          <Select value={betslip.bookmaker} onValueChange={(value) => handleBookmakerChange(value as Bookmaker)}>
+            <SelectTrigger id="bookmaker">
+              <SelectValue placeholder="Select Bookmaker" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="bet365">bet365</SelectItem>
+              <SelectItem value="draftkings">DraftKings</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <Tabs defaultValue="matches" value={activeTab} onValueChange={setActiveTab}>
@@ -212,7 +236,7 @@ const BetslipForm: React.FC<BetslipFormProps> = ({ betslip, onBetslipChange }) =
           <TabsContent value="stake">
             <div className="space-y-4">
               <div>
-                <Label htmlFor="stake" className="text-sm font-medium">Stake Amount (£)</Label>
+                <Label htmlFor="stake" className="text-sm font-medium">Stake Amount ({betslip.currency === 'USD' ? '$' : '£'})</Label>
                 <Input
                   id="stake"
                   type="number"
