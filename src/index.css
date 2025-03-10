@@ -149,7 +149,7 @@
 }
 
 .dk-betslip-header {
-  @apply bg-[#222222] p-4;
+  @apply bg-[#111111] p-4;
 }
 
 .dk-betslip-content {
@@ -177,7 +177,7 @@
 }
 
 .dk-bet-details {
-  @apply p-4 bg-[#f6f6f7] rounded-md space-y-2;
+  @apply p-4 bg-[#1e1e1e] rounded-md space-y-2 text-white;
 }
 
 .dk-betslip-footer {
