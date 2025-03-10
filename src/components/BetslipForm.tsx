@@ -142,9 +142,23 @@ const BetslipForm: React.FC<BetslipFormProps> = ({ betslip, onBetslipChange }) =
                           <SelectItem value="Over/Under 2.5 Goals">Over/Under 2.5 Goals</SelectItem>
                           <SelectItem value="Correct Score">Correct Score</SelectItem>
                           <SelectItem value="First Goalscorer">First Goalscorer</SelectItem>
+                          <SelectItem value="Custom">Custom Market</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
+
+                    {selection.market === "Custom" && (
+                      <div>
+                        <Label htmlFor={`custom-market-${selection.id}`} className="text-xs">Custom Market Text</Label>
+                        <Input
+                          id={`custom-market-${selection.id}`}
+                          value={selection.customMarket || ''}
+                          onChange={(e) => handleSelectionChange(selection.id, 'customMarket', e.target.value)}
+                          placeholder="Enter your custom market text"
+                          className="h-9"
+                        />
+                      </div>
+                    )}
 
                     <div className="grid grid-cols-2 gap-2">
                       <div>

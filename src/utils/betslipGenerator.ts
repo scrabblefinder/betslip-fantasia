@@ -45,6 +45,7 @@ export interface BetSelection {
   homeTeam: string;
   awayTeam: string;
   market: string;
+  customMarket?: string; // New field for custom market text
   selection: string;
   odds: number;
   eventDate: Date;
@@ -96,6 +97,13 @@ export const removeSelection = (betslip: BetslipData, id: string): BetslipData =
     ...betslip,
     selections: betslip.selections.filter(selection => selection.id !== id)
   };
+};
+
+// Get the display market text (use custom market if available)
+export const getMarketDisplayText = (selection: BetSelection): string => {
+  return selection.market === 'Custom' && selection.customMarket 
+    ? selection.customMarket 
+    : selection.market;
 };
 
 // Calculate total odds for accumulator
