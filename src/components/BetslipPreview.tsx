@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Download, Share } from "lucide-react";
+import { Download, Share, Check } from "lucide-react";
 import { 
   BetslipData, 
   formatDate, 
@@ -161,44 +160,22 @@ const Bet365BetslipPreview: React.FC<BetslipContentProps> = ({ betslip, totalOdd
 const DraftKingsBetslipPreview: React.FC<BetslipContentProps> = ({ betslip, totalOdds, totalReturns }) => {
   return (
     <div id="betslip-preview" className="betslip dk-betslip">
-      <div className="dk-betslip-header">
-        <div className="flex items-center justify-between">
-          <span className="text-xl font-bold text-white">DraftKings</span>
-          <div className="flex flex-col items-end">
-            <span className="text-xs text-white opacity-80">Ticket #</span>
-            <span className="font-mono text-sm text-white">{betslip.receiptNumber}</span>
-          </div>
-        </div>
-      </div>
-      
       <div className="dk-betslip-content">
-        <div className="dk-betslip-info">
-          <div className="flex justify-between text-xs text-gray-700">
-            <span>Created: {formatDate(betslip.placedAt)} {formatTime(betslip.placedAt)}</span>
-          </div>
-          
-          <div className="dk-chip">
-            {betslip.betType.charAt(0).toUpperCase() + betslip.betType.slice(1)}
-          </div>
-        </div>
-        
         <div className="dk-selections">
           {betslip.selections.map((selection, index) => (
-            <div key={selection.id} className="dk-selection-item">
-              <div className="flex justify-between items-center">
-                <span className="font-medium">{selection.homeTeam} vs {selection.awayTeam}</span>
-                <span className="text-sm text-gray-600">{formatDate(selection.eventDate)}</span>
-              </div>
-              
-              <div className="flex justify-between items-center mt-2">
-                <div>
-                  <span className="text-xs text-gray-700">{getMarketDisplayText(selection)}</span>
-                  <div className="font-semibold text-dk-blue">{selection.selection}</div>
+            <div key={selection.id} className={`dk-selection-item ${index === 0 ? 'border-t-0' : ''}`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="dk-check-icon">
+                    <Check className="h-4 w-4 text-black" />
+                  </div>
+                  <div className="dk-selection-title">{selection.selection}</div>
                 </div>
-                <div className="dk-odds">
-                  <span>{selection.odds > 2 ? `+${Math.round((selection.odds - 1) * 100)}` : `-${Math.round(100 / (selection.odds - 1))}`}</span>
-                </div>
+                <div className="dk-odds">−{Math.round(100 / (selection.odds - 1))}</div>
               </div>
+              <div className="dk-selection-subtitle">MONEYLINE</div>
+              <div className="dk-selection-matchup">{selection.homeTeam} @ {selection.awayTeam} (Today {formatTime(selection.eventDate)})</div>
+              <div className="dk-selection-result">Result: {Math.floor(Math.random() * 100)} : {Math.floor(Math.random() * 100)}</div>
             </div>
           ))}
         </div>
@@ -212,19 +189,23 @@ const DraftKingsBetslipPreview: React.FC<BetslipContentProps> = ({ betslip, tota
           {betslip.selections.length > 1 && (
             <div className="flex justify-between items-center">
               <span className="text-sm">Total Odds</span>
-              <span className="font-medium">{totalOdds > 2 ? `+${Math.round((totalOdds - 1) * 100)}` : `-${Math.round(100 / (totalOdds - 1))}`}</span>
+              <span className="font-medium">{totalOdds > 2 ? `+${Math.round((totalOdds - 1) * 100)}` : `−${Math.round(100 / (totalOdds - 1))}`}</span>
             </div>
           )}
           
-          <div className="flex justify-between items-center mt-2">
+          <div className="flex justify-between items-center">
             <span className="text-sm font-semibold">Potential Payout</span>
             <span className="font-bold text-dk-blue">{formatCurrency(totalReturns, betslip.currency)}</span>
           </div>
         </div>
       </div>
       
+      <div className="dk-receipt">
+        <span>Receipt# {betslip.receiptNumber}</span>
+      </div>
+      
       <div className="dk-betslip-footer">
-        <div className="text-xs text-center text-gray-600">
+        <div className="text-xs text-center text-gray-400">
           <p>This is a simulated betslip for entertainment purposes only.</p>
           <p>Not affiliated with DraftKings.</p>
         </div>

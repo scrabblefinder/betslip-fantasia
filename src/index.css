@@ -143,17 +143,17 @@
 
 /* DraftKings Betslip Styles */
 .dk-betslip {
-  @apply relative bg-white rounded-lg overflow-hidden betslip-shadow animate-scale-in;
+  @apply relative bg-[#1a1a1a] rounded-lg overflow-hidden betslip-shadow animate-scale-in;
   max-width: 400px;
   width: 100%;
 }
 
 .dk-betslip-header {
-  @apply bg-[#111111] p-4;
+  @apply bg-[#1a1a1a] p-4;
 }
 
 .dk-betslip-content {
-  @apply p-4 space-y-4;
+  @apply p-4 space-y-4 bg-[#1a1a1a] text-white;
 }
 
 .dk-betslip-info {
@@ -161,31 +161,59 @@
 }
 
 .dk-chip {
-  @apply inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 mt-2;
+  @apply inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-[#333333] text-white mt-2;
 }
 
 .dk-selections {
-  @apply space-y-4;
+  @apply space-y-6;
 }
 
 .dk-selection-item {
-  @apply p-3 border border-gray-200 rounded-md bg-white shadow-sm;
+  @apply p-0 border-0 border-t border-[#333333] py-6 bg-[#1a1a1a] text-white;
+}
+
+.dk-selection-title {
+  @apply font-bold text-xl mb-1;
+}
+
+.dk-selection-subtitle {
+  @apply text-[#00dd00] uppercase font-bold mb-2;
+}
+
+.dk-selection-matchup {
+  @apply text-gray-400 mb-1;
+}
+
+.dk-selection-info {
+  @apply text-gray-400;
+}
+
+.dk-selection-result {
+  @apply text-gray-400 mb-2;
 }
 
 .dk-odds {
-  @apply px-3 py-1 rounded-md bg-[#f1f1f1] text-sm font-medium;
+  @apply text-white text-2xl font-bold;
 }
 
 .dk-bet-details {
-  @apply p-4 bg-[#1e1e1e] rounded-md space-y-2 text-white;
+  @apply p-4 bg-[#1a1a1a] space-y-2 text-white border-t border-[#333333];
 }
 
 .dk-betslip-footer {
-  @apply p-4 bg-white border-t border-gray-100;
+  @apply p-4 bg-[#1a1a1a] border-t border-[#333333] text-white;
 }
 
 .text-dk-blue {
-  @apply text-[#33C3F0];
+  @apply text-[#00dd00];
+}
+
+.dk-receipt {
+  @apply text-center text-gray-500 text-sm py-2 border-t border-[#333333];
+}
+
+.dk-check-icon {
+  @apply w-6 h-6 rounded-full bg-[#00dd00] flex items-center justify-center mr-2;
 }
 
 /* Animation classes */
