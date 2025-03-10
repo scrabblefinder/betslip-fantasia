@@ -154,62 +154,111 @@ export const downloadBetslip = async (elementId: string, filename: string): Prom
       throw new Error('Element not found');
     }
     
-    // Create a clone of the element to avoid modifying the original DOM
+    // Create a deep clone of the element
     const clone = element.cloneNode(true) as HTMLElement;
     
-    // Apply styles to ensure proper rendering
+    // Apply styles for proper rendering
     clone.style.position = 'fixed';
     clone.style.top = '0';
     clone.style.left = '0';
     clone.style.width = element.offsetWidth + 'px';
     clone.style.height = element.offsetHeight + 'px';
     clone.style.zIndex = '-9999';
-    clone.style.backgroundColor = 'white'; // Ensure white background
+    clone.style.backgroundColor = 'white';
     
-    // Fix for backdrop-filter and opacity issues
+    // Fix all child elements to ensure exact rendering
     const allElements = clone.querySelectorAll('*');
     allElements.forEach((el) => {
       const element = el as HTMLElement;
       const computedStyle = window.getComputedStyle(element);
       
-      // Remove any backdrop filters
+      // Remove backdrop filters
       if (computedStyle.backdropFilter) {
         element.style.backdropFilter = 'none';
       }
       
-      // Fix opacity to 1
-      if (computedStyle.opacity !== '1') {
-        element.style.opacity = '1';
-      }
+      // Ensure full opacity
+      element.style.opacity = '1';
       
-      // Ensure background colors are solid
+      // Convert all rgba to rgb to prevent transparency issues
       if (computedStyle.backgroundColor && computedStyle.backgroundColor.includes('rgba')) {
-        // Convert rgba to rgb
-        const rgba = computedStyle.backgroundColor.match(/rgba?\((\d+), (\d+), (\d+),?(?:\s+)?(\d*\.?\d*)?\)/);
+        const rgba = computedStyle.backgroundColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(?:\d*\.)?\d+)?\)/);
         if (rgba) {
           element.style.backgroundColor = `rgb(${rgba[1]}, ${rgba[2]}, ${rgba[3]})`;
         }
       }
+      
+      // Fix text colors that might be using rgba
+      if (computedStyle.color && computedStyle.color.includes('rgba')) {
+        const rgba = computedStyle.color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(?:\d*\.)?\d+)?\)/);
+        if (rgba) {
+          element.style.color = `rgb(${rgba[1]}, ${rgba[2]}, ${rgba[3]})`;
+        }
+      }
+      
+      // Fix border colors
+      if (computedStyle.borderColor && computedStyle.borderColor.includes('rgba')) {
+        const rgba = computedStyle.borderColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(?:\d*\.)?\d+)?\)/);
+        if (rgba) {
+          element.style.borderColor = `rgb(${rgba[1]}, ${rgba[2]}, ${rgba[3]})`;
+        }
+      }
+      
+      // Ensure full saturation of colors for bet365 green elements
+      if (element.classList.contains('text-bet365-green') || 
+          (computedStyle.color === 'rgb(30, 126, 52)' || computedStyle.color === 'rgba(30, 126, 52, 0.8)')) {
+        element.style.color = 'rgb(30, 126, 52)';
+      }
+      
+      // Fix DraftKings blue elements
+      if (element.classList.contains('text-dk-blue')) {
+        element.style.color = 'rgb(0, 221, 0)';
+      }
+      
+      // Fix any background opacity issues with bet365 green
+      if (element.classList.contains('bg-bet365-green') || 
+          computedStyle.backgroundColor === 'rgba(30, 126, 52, 0.1)') {
+        element.style.backgroundColor = 'rgb(30, 126, 52)';
+        // If it's supposed to be light green (like chips)
+        if (element.classList.contains('bg-opacity-10')) {
+          element.style.backgroundColor = 'rgba(30, 126, 52, 0.1)';
+          // Force full saturation for download
+          element.style.backgroundColor = 'rgb(235, 247, 238)';
+        }
+      }
     });
     
-    // Append to document, capture, then remove
+    // Append to document temporarily
     document.body.appendChild(clone);
     
+    // Capture with enhanced settings
     const canvas = await html2canvas(clone, {
-      scale: 2,
+      scale: 2, // Higher scale for better quality
       logging: false,
       useCORS: true,
       backgroundColor: '#ffffff',
       removeContainer: true,
-      // Disable transparency, fixes issues with opacity
-      allowTaint: true
+      allowTaint: true,
+      onclone: (clonedDoc) => {
+        // Additional fixes in the clone document
+        const clonedElement = clonedDoc.getElementById(elementId);
+        if (clonedElement) {
+          // Ensure all text is fully opaque
+          const textElements = clonedElement.querySelectorAll('*');
+          textElements.forEach((el) => {
+            (el as HTMLElement).style.color = (el as HTMLElement).style.color.replace('rgba', 'rgb').replace(/,[^)]+\)/, ')');
+          });
+        }
+      }
     });
     
+    // Remove the clone from the document
     document.body.removeChild(clone);
     
+    // Create download link
     const link = document.createElement('a');
     link.download = filename;
-    link.href = canvas.toDataURL('image/png');
+    link.href = canvas.toDataURL('image/png', 1.0); // Use maximum quality
     link.click();
     
   } catch (error) {
@@ -231,57 +280,105 @@ export const shareBetslip = async (elementId: string, title: string): Promise<vo
       throw new Error('Element not found');
     }
     
-    // Create a clone of the element to avoid modifying the original DOM
+    // Create a deep clone of the element
     const clone = element.cloneNode(true) as HTMLElement;
     
-    // Apply styles to ensure proper rendering
+    // Apply styles for proper rendering
     clone.style.position = 'fixed';
     clone.style.top = '0';
     clone.style.left = '0';
     clone.style.width = element.offsetWidth + 'px';
     clone.style.height = element.offsetHeight + 'px';
     clone.style.zIndex = '-9999';
-    clone.style.backgroundColor = 'white'; // Ensure white background
+    clone.style.backgroundColor = 'white';
     
-    // Fix for backdrop-filter and opacity issues
+    // Fix all child elements to ensure exact rendering
     const allElements = clone.querySelectorAll('*');
     allElements.forEach((el) => {
       const element = el as HTMLElement;
       const computedStyle = window.getComputedStyle(element);
       
-      // Remove any backdrop filters
+      // Remove backdrop filters
       if (computedStyle.backdropFilter) {
         element.style.backdropFilter = 'none';
       }
       
-      // Fix opacity to 1
-      if (computedStyle.opacity !== '1') {
-        element.style.opacity = '1';
-      }
+      // Ensure full opacity
+      element.style.opacity = '1';
       
-      // Ensure background colors are solid
+      // Convert all rgba to rgb to prevent transparency issues
       if (computedStyle.backgroundColor && computedStyle.backgroundColor.includes('rgba')) {
-        // Convert rgba to rgb
-        const rgba = computedStyle.backgroundColor.match(/rgba?\((\d+), (\d+), (\d+),?(?:\s+)?(\d*\.?\d*)?\)/);
+        const rgba = computedStyle.backgroundColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(?:\d*\.)?\d+)?\)/);
         if (rgba) {
           element.style.backgroundColor = `rgb(${rgba[1]}, ${rgba[2]}, ${rgba[3]})`;
         }
       }
+      
+      // Fix text colors that might be using rgba
+      if (computedStyle.color && computedStyle.color.includes('rgba')) {
+        const rgba = computedStyle.color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(?:\d*\.)?\d+)?\)/);
+        if (rgba) {
+          element.style.color = `rgb(${rgba[1]}, ${rgba[2]}, ${rgba[3]})`;
+        }
+      }
+      
+      // Fix border colors
+      if (computedStyle.borderColor && computedStyle.borderColor.includes('rgba')) {
+        const rgba = computedStyle.borderColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(?:\d*\.)?\d+)?\)/);
+        if (rgba) {
+          element.style.borderColor = `rgb(${rgba[1]}, ${rgba[2]}, ${rgba[3]})`;
+        }
+      }
+      
+      // Ensure full saturation of colors for bet365 green elements
+      if (element.classList.contains('text-bet365-green') || 
+          (computedStyle.color === 'rgb(30, 126, 52)' || computedStyle.color === 'rgba(30, 126, 52, 0.8)')) {
+        element.style.color = 'rgb(30, 126, 52)';
+      }
+      
+      // Fix DraftKings blue elements
+      if (element.classList.contains('text-dk-blue')) {
+        element.style.color = 'rgb(0, 221, 0)';
+      }
+      
+      // Fix any background opacity issues with bet365 green
+      if (element.classList.contains('bg-bet365-green') || 
+          computedStyle.backgroundColor === 'rgba(30, 126, 52, 0.1)') {
+        element.style.backgroundColor = 'rgb(30, 126, 52)';
+        // If it's supposed to be light green (like chips)
+        if (element.classList.contains('bg-opacity-10')) {
+          element.style.backgroundColor = 'rgba(30, 126, 52, 0.1)';
+          // Force full saturation for download
+          element.style.backgroundColor = 'rgb(235, 247, 238)';
+        }
+      }
     });
     
-    // Append to document, capture, then remove
+    // Append to document temporarily
     document.body.appendChild(clone);
     
+    // Capture with enhanced settings
     const canvas = await html2canvas(clone, {
-      scale: 2,
+      scale: 2, // Higher scale for better quality
       logging: false,
       useCORS: true,
       backgroundColor: '#ffffff',
       removeContainer: true,
-      // Disable transparency, fixes issues with opacity
-      allowTaint: true
+      allowTaint: true,
+      onclone: (clonedDoc) => {
+        // Additional fixes in the clone document
+        const clonedElement = clonedDoc.getElementById(elementId);
+        if (clonedElement) {
+          // Ensure all text is fully opaque
+          const textElements = clonedElement.querySelectorAll('*');
+          textElements.forEach((el) => {
+            (el as HTMLElement).style.color = (el as HTMLElement).style.color.replace('rgba', 'rgb').replace(/,[^)]+\)/, ')');
+          });
+        }
+      }
     });
     
+    // Remove the clone from the document
     document.body.removeChild(clone);
     
     canvas.toBlob(async (blob) => {
@@ -295,7 +392,7 @@ export const shareBetslip = async (elementId: string, title: string): Promise<vo
         title,
         files: [file]
       });
-    });
+    }, 'image/png', 1.0); // Use maximum quality
     
   } catch (error) {
     console.error('Error sharing betslip:', error);
