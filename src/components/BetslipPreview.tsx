@@ -12,7 +12,8 @@ import {
   formatCurrency,
   calculateTotalOdds,
   downloadBetslip,
-  shareBetslip
+  shareBetslip,
+  getMarketDisplayText
 } from "@/utils/betslipGenerator";
 
 interface BetslipPreviewProps {
@@ -100,7 +101,7 @@ const BetslipPreview: React.FC<BetslipPreviewProps> = ({ betslip }) => {
                   </div>
                   
                   <div className="flex justify-between text-xs">
-                    <span className="text-gray-600">{selection.market}</span>
+                    <span className="text-gray-600">{getMarketDisplayText(selection)}</span>
                     <span className="font-semibold text-bet365-green">{selection.selection}</span>
                   </div>
                 </div>
