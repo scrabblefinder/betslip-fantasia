@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -85,7 +86,8 @@ const BetslipForm: React.FC<BetslipFormProps> = ({ betslip, onBetslipChange }) =
       ...betslip,
       bookmaker,
       currency: 'GBP',
-      customBookmakerName: bookmaker === 'bet365' ? undefined : betslip.customBookmakerName
+      // Removed the conditional with 'bet365' since it's not valid in the Bookmaker type anymore
+      customBookmakerName: betslip.customBookmakerName
     });
   };
 

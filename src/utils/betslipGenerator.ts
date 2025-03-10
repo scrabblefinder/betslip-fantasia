@@ -1,3 +1,5 @@
+import { toPng } from 'html-to-image';
+
 // Format date to display in betslip
 export const formatDate = (date: Date): string => {
   return date.toLocaleDateString('en-GB', {
@@ -184,15 +186,23 @@ export const downloadBetslip = async (elementId: string, filename: string): Prom
       throw new Error('Element not found');
     }
 
+    // Add a class to properly style for image capture
+    element.classList.add('capturing');
+
     const dataUrl = await toPng(element, {
       quality: 1.0,
       pixelRatio: 2,
       backgroundColor: '#ffffff',
       style: {
-        transform: 'scale(1)',
-        transformOrigin: 'top left',
+        margin: '0',
+        padding: '20px',
+        boxShadow: 'none',
+        border: 'none',
       }
     });
+
+    // Remove the class after capturing
+    element.classList.remove('capturing');
 
     const link = document.createElement('a');
     link.download = filename;
@@ -217,15 +227,23 @@ export const shareBetslip = async (elementId: string, title: string): Promise<vo
       throw new Error('Element not found');
     }
 
+    // Add a class to properly style for image capture
+    element.classList.add('capturing');
+
     const dataUrl = await toPng(element, {
       quality: 1.0,
       pixelRatio: 2,
       backgroundColor: '#ffffff',
       style: {
-        transform: 'scale(1)',
-        transformOrigin: 'top left',
+        margin: '0',
+        padding: '20px',
+        boxShadow: 'none',
+        border: 'none',
       }
     });
+
+    // Remove the class after capturing
+    element.classList.remove('capturing');
 
     const response = await fetch(dataUrl);
     const blob = await response.blob();

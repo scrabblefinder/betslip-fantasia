@@ -1,8 +1,10 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Download, Share, Check } from "lucide-react";
+import { Download, Share, Check, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { 
   BetslipData, 
   formatDate, 
@@ -22,16 +24,38 @@ interface BetslipPreviewProps {
 }
 
 const BetslipPreview: React.FC<BetslipPreviewProps> = ({ betslip }) => {
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
+  
   const totalOdds = calculateTotalOdds(betslip.selections);
   const totalReturns = calculateReturns(betslip.stake, totalOdds);
   
   const handleDownload = async () => {
-    await downloadBetslip('betslip-preview', `${betslip.customBookmakerName}-${betslip.receiptNumber}.png`);
+    try {
+      setIsDownloading(true);
+      const bookmakerName = getBookmakerDisplayName(betslip);
+      await downloadBetslip('betslip-preview', `${bookmakerName}-${betslip.receiptNumber}.png`);
+      toast.success("Betslip downloaded successfully");
+    } catch (error) {
+      console.error('Download error:', error);
+      toast.error("Failed to download betslip");
+    } finally {
+      setIsDownloading(false);
+    }
   };
   
   const handleShare = async () => {
-    const bookmakerName = getBookmakerDisplayName(betslip);
-    await shareBetslip('betslip-preview', `My ${bookmakerName} Betslip`);
+    try {
+      setIsSharing(true);
+      const bookmakerName = getBookmakerDisplayName(betslip);
+      await shareBetslip('betslip-preview', `My ${bookmakerName} Betslip`);
+      toast.success("Betslip shared successfully");
+    } catch (error) {
+      console.error('Share error:', error);
+      toast.error("Failed to share betslip");
+    } finally {
+      setIsSharing(false);
+    }
   };
 
   const isShareSupported = typeof navigator !== 'undefined' && !!navigator.share;
@@ -47,20 +71,40 @@ const BetslipPreview: React.FC<BetslipPreviewProps> = ({ betslip }) => {
                 variant="outline" 
                 size="sm" 
                 onClick={handleDownload}
+                disabled={isDownloading}
                 className="flex items-center gap-1"
               >
-                <Download className="h-4 w-4" />
-                <span>Download</span>
+                {isDownloading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>Downloading...</span>
+                  </>
+                ) : (
+                  <>
+                    <Download className="h-4 w-4" />
+                    <span>Download</span>
+                  </>
+                )}
               </Button>
               {isShareSupported && (
                 <Button 
                   variant="outline" 
                   size="sm" 
                   onClick={handleShare}
+                  disabled={isSharing}
                   className="flex items-center gap-1"
                 >
-                  <Share className="h-4 w-4" />
-                  <span>Share</span>
+                  {isSharing ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>Sharing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Share className="h-4 w-4" />
+                      <span>Share</span>
+                    </>
+                  )}
                 </Button>
               )}
             </div>
@@ -85,8 +129,8 @@ const CustomBetslipPreview: React.FC<BetslipContentProps> = ({ betslip, totalOdd
   const bookmakerName = getBookmakerDisplayName(betslip);
   
   return (
-    <div id="betslip-preview" className="betslip bg-white p-4">
-      <div className="betslip-header">
+    <div id="betslip-preview" className="betslip bg-white p-4 rounded-md border border-gray-200">
+      <div className="betslip-header flex justify-between items-center mb-2">
         <div className="flex items-center">
           <span className="text-xl font-bold">{bookmakerName}</span>
         </div>
@@ -97,19 +141,19 @@ const CustomBetslipPreview: React.FC<BetslipContentProps> = ({ betslip, totalOdd
       </div>
       
       <div className="betslip-content">
-        <div className="flex justify-between text-xs text-gray-500">
+        <div className="flex justify-between text-xs text-gray-500 mb-2">
           <span>Placed: {formatDate(betslip.placedAt)}</span>
           <span>{formatTime(betslip.placedAt)}</span>
         </div>
         
-        <div className="bet365-chip bg-bet365-green bg-opacity-10 text-bet365-green">
+        <div className="bg-bet365-green bg-opacity-10 text-bet365-green px-2 py-1 text-sm rounded-sm inline-block mb-2">
           {betslip.betType.charAt(0).toUpperCase() + betslip.betType.slice(1)}
         </div>
         
         <Separator className="my-3" />
         
         {betslip.selections.map((selection, index) => (
-          <div key={selection.id} className="match-item">
+          <div key={selection.id} className="match-item mb-3 pb-2">
             <div className="flex justify-between items-center mb-1">
               <span className="text-xs text-gray-500">
                 {formatDate(selection.eventDate)} {formatTime(selection.eventDate)}
@@ -150,7 +194,7 @@ const CustomBetslipPreview: React.FC<BetslipContentProps> = ({ betslip, totalOdd
         </div>
       </div>
       
-      <div className="betslip-footer">
+      <div className="betslip-footer mt-4">
         <div className="text-xs text-center text-gray-500">
           <p>This is a simulated betslip for entertainment purposes only.</p>
           <p>Not affiliated with {bookmakerName}.</p>
