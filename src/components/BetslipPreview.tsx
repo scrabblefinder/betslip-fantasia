@@ -2,31 +2,21 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { 
-  Download, 
-  Share, 
-  Loader2, 
-  FacebookIcon, 
-  TwitterIcon, 
-  Share2Icon,
-  SendIcon
-} from "lucide-react";
+import { Download, Share, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { 
-  BetslipData, 
-  formatDate, 
-  formatTime, 
-  calculateReturns, 
+import ShareButtons from './ShareButtons';
+import {
+  BetslipData,
+  formatDate,
+  formatTime,
+  calculateReturns,
   formatCurrency,
   calculateTotalOdds,
   downloadBetslip,
-  shareBetslip,
   getMarketDisplayText,
   getBookmakerDisplayName,
   formatOdds,
-  generateBetslipImage,
-  shareOnSocialMedia,
-  getShareableImageUrl
+  generateBetslipImage
 } from "@/utils/betslipGenerator";
 
 interface BetslipPreviewProps {
@@ -35,9 +25,8 @@ interface BetslipPreviewProps {
 
 const BetslipPreview: React.FC<BetslipPreviewProps> = ({ betslip }) => {
   const [isDownloading, setIsDownloading] = useState(false);
-  const [isSharing, setIsSharing] = useState(false);
-  const [showSocialButtons, setShowSocialButtons] = useState(false);
-  const [isSharingToSocial, setIsSharingToSocial] = useState<string | null>(null);
+  const [showShareButtons, setShowShareButtons] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string>('');
   
   const totalOdds = calculateTotalOdds(betslip.selections);
   const totalReturns = calculateReturns(betslip.stake, totalOdds);
@@ -58,61 +47,15 @@ const BetslipPreview: React.FC<BetslipPreviewProps> = ({ betslip }) => {
   
   const handleShare = async () => {
     try {
-      setIsSharing(true);
-      
-      // Always show social sharing buttons instead of trying to use the Web Share API
-      // This is more reliable across devices and browsers
-      setShowSocialButtons(!showSocialButtons);
-      
-      // Only attempt native sharing on mobile devices where it's more likely to be supported
-      if (navigator.share && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-        try {
-          const bookmakerName = getBookmakerDisplayName(betslip);
-          await shareBetslip('betslip-preview', `My ${bookmakerName} Betslip`);
-          toast.success("Betslip shared successfully");
-          setShowSocialButtons(false); // Hide social buttons if native sharing worked
-        } catch (shareError) {
-          console.error('Native share error:', shareError);
-          // If native sharing fails, we'll show the social buttons (already set above)
-          // No need to show an error toast as we're falling back to social buttons
-        }
-      }
+      const dataUrl = await generateBetslipImage('betslip-preview');
+      setImageUrl(dataUrl);
+      setShowShareButtons(!showShareButtons);
     } catch (error) {
       console.error('Share error:', error);
-      // No error toast here as we're showing social buttons instead
-    } finally {
-      setIsSharing(false);
-    }
-  };
-  
-  const handleSocialShare = async (platform: 'facebook' | 'twitter' | 'reddit' | 'whatsapp') => {
-    try {
-      setIsSharingToSocial(platform);
-      const bookmakerName = getBookmakerDisplayName(betslip);
-      
-      // Generate the image
-      const imageDataUrl = await generateBetslipImage('betslip-preview');
-      
-      // Get a shareable URL (in a real app, this would upload the image to a server)
-      const shareableUrl = await getShareableImageUrl(imageDataUrl);
-      
-      // Share to the selected platform
-      const shareText = `Check out my ${bookmakerName} betslip!`;
-      shareOnSocialMedia(platform, shareableUrl, shareText);
-      
-      toast.success(`Opening ${platform} to share your betslip`);
-    } catch (error) {
-      console.error(`${platform} share error:`, error);
-      toast.error(`Failed to share to ${platform}`);
-    } finally {
-      setIsSharingToSocial(null);
+      toast.error("Failed to prepare betslip for sharing");
     }
   };
 
-  // We'll check for share support, but default to showing social buttons in most cases
-  const isShareSupported = typeof navigator !== 'undefined' && !!navigator.share && 
-                           /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  
   return (
     <div className="w-full max-w-md mx-auto">
       <Card className="mb-4 animate-fade-in">
@@ -144,82 +87,18 @@ const BetslipPreview: React.FC<BetslipPreviewProps> = ({ betslip }) => {
                 variant="outline" 
                 size="sm" 
                 onClick={handleShare}
-                disabled={isSharing}
                 className="flex items-center gap-1"
               >
-                {isSharing ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Sharing...</span>
-                  </>
-                ) : (
-                  <>
-                    <Share className="h-4 w-4" />
-                    <span>{isShareSupported ? "Share" : "Social"}</span>
-                  </>
-                )}
+                <Share className="h-4 w-4" />
+                <span>Share</span>
               </Button>
             </div>
           </div>
           
-          {/* Social media sharing buttons */}
-          {showSocialButtons && (
-            <div className="flex justify-end gap-2 mb-4 animate-fade-in">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleSocialShare('facebook')}
-                disabled={isSharingToSocial !== null}
-                className="bg-[#1877F2] text-white hover:bg-[#1877F2]/90"
-              >
-                {isSharingToSocial === 'facebook' ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <FacebookIcon className="h-4 w-4" />
-                )}
-              </Button>
-              
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleSocialShare('twitter')}
-                disabled={isSharingToSocial !== null}
-                className="bg-[#1DA1F2] text-white hover:bg-[#1DA1F2]/90"
-              >
-                {isSharingToSocial === 'twitter' ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <TwitterIcon className="h-4 w-4" />
-                )}
-              </Button>
-              
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleSocialShare('reddit')}
-                disabled={isSharingToSocial !== null}
-                className="bg-[#FF4500] text-white hover:bg-[#FF4500]/90"
-              >
-                {isSharingToSocial === 'reddit' ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Share2Icon className="h-4 w-4" />
-                )}
-              </Button>
-              
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleSocialShare('whatsapp')}
-                disabled={isSharingToSocial !== null}
-                className="bg-[#25D366] text-white hover:bg-[#25D366]/90"
-              >
-                {isSharingToSocial === 'whatsapp' ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <SendIcon className="h-4 w-4" />
-                )}
-              </Button>
+          {/* ShareThis buttons */}
+          {showShareButtons && imageUrl && (
+            <div className="mb-4 animate-fade-in">
+              <ShareButtons imageUrl={imageUrl} />
             </div>
           )}
           
