@@ -25,6 +25,15 @@ interface BetslipFormProps {
 const BetslipForm: React.FC<BetslipFormProps> = ({ betslip, onBetslipChange }) => {
   const [activeTab, setActiveTab] = useState<string>("matches");
 
+  // Add useEffect to handle automatic bet type changes based on number of selections
+  useEffect(() => {
+    if (betslip.selections.length > 1 && betslip.betType === 'single') {
+      const newBetType = betslip.selections.length === 2 ? 'double' : 
+                        betslip.selections.length === 3 ? 'treble' : 'accumulator';
+      onBetslipChange({...betslip, betType: newBetType});
+    }
+  }, [betslip.selections.length]);
+
   const handleResetForm = () => {
     onBetslipChange(createBlankBetslip());
   };
@@ -190,7 +199,7 @@ const BetslipForm: React.FC<BetslipFormProps> = ({ betslip, onBetslipChange }) =
                           <SelectItem value="Over/Under 2.5 Goals">Over/Under 2.5 Goals</SelectItem>
                           <SelectItem value="Correct Score">Correct Score</SelectItem>
                           <SelectItem value="First Goalscorer">First Goalscorer</SelectItem>
-                          <SelectItem value="Custom">Custom Market</SelectItem>
+                          <SelectItem value="Custom">Custom</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -352,4 +361,3 @@ const BetslipForm: React.FC<BetslipFormProps> = ({ betslip, onBetslipChange }) =
 };
 
 export default BetslipForm;
-
