@@ -1,18 +1,324 @@
+
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>betslip-fantasia</title>
-    <meta name="description" content="Lovable Generated Project" />
-    <meta name="author" content="Lovable" />
-    <meta property="og:image" content="/og-image.png" />
-  </head>
-
-  <body>
-    <div id="root"></div>
-    <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
-    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Betslip Generator</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+</head>
+<body>
+  <div class="min-h-screen bg-gradient-to-b from-white to-gray-100">
+    <header class="py-4 px-6 shadow-md bg-bet365-green">
+      <div class="container mx-auto">
+        <h1 class="text-white text-2xl font-bold">Betslip Generator</h1>
+        <p class="text-white text-opacity-80 text-sm">Create realistic looking betting slips</p>
+      </div>
+    </header>
+    
+    <main class="container mx-auto px-4 py-8">
+      <div class="max-w-5xl mx-auto">
+        <div class="glass-effect rounded-xl p-6 mb-6 text-center animate-fade-in">
+          <h2 class="text-2xl font-bold mb-2">Create Your Fake Betslip</h2>
+          <p class="text-gray-600 max-w-2xl mx-auto">
+            Customize every detail of your betting slip to share with friends. This is for entertainment purposes only.
+          </p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Betslip Form -->
+          <div class="betslip-form">
+            <div class="card shadow-md rounded-lg overflow-hidden">
+              <div class="p-6">
+                <h2 class="text-xl font-semibold mb-4">Create Your Betslip</h2>
+                <form id="betslipForm">
+                  <!-- Bookmaker Section -->
+                  <div class="mb-6">
+                    <h3 class="font-medium mb-3 flex items-center">
+                      <span class="bg-bet365-green w-6 h-6 rounded-full text-white flex items-center justify-center mr-2">1</span>
+                      Bookmaker Settings
+                    </h3>
+                    <div class="space-y-4">
+                      <div class="form-group">
+                        <label for="bookmakerName" class="block text-sm font-medium mb-1">Bookmaker Name</label>
+                        <input type="text" id="bookmakerName" class="bet365-input" value="Your Bookmaker">
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Match Information -->
+                  <div class="mb-6">
+                    <h3 class="font-medium mb-3 flex items-center">
+                      <span class="bg-bet365-green w-6 h-6 rounded-full text-white flex items-center justify-center mr-2">2</span>
+                      Match Details
+                    </h3>
+                    <div id="selectionsContainer">
+                      <div class="selection-row mb-4 p-4 border border-gray-200 rounded-md">
+                        <div class="grid grid-cols-2 gap-3">
+                          <div class="form-group">
+                            <label class="block text-sm font-medium mb-1">Home Team</label>
+                            <input type="text" class="home-team bet365-input" value="Manchester United">
+                          </div>
+                          <div class="form-group">
+                            <label class="block text-sm font-medium mb-1">Away Team</label>
+                            <input type="text" class="away-team bet365-input" value="Liverpool">
+                          </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 mt-3">
+                          <div class="form-group">
+                            <label class="block text-sm font-medium mb-1">Market</label>
+                            <select class="market bet365-input">
+                              <option value="Match Result">Match Result</option>
+                              <option value="Both Teams To Score">Both Teams To Score</option>
+                              <option value="Over/Under">Over/Under</option>
+                              <option value="Correct Score">Correct Score</option>
+                              <option value="Custom">Custom</option>
+                            </select>
+                          </div>
+                          <div class="form-group">
+                            <label class="block text-sm font-medium mb-1">Selection</label>
+                            <input type="text" class="selection bet365-input" value="Manchester United">
+                          </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 mt-3">
+                          <div class="form-group">
+                            <label class="block text-sm font-medium mb-1">Odds</label>
+                            <input type="number" step="0.01" min="1.01" class="odds bet365-input" value="2.50">
+                          </div>
+                          <div class="form-group">
+                            <label class="block text-sm font-medium mb-1">Event Date</label>
+                            <input type="datetime-local" class="event-date bet365-input" value="2023-06-01T15:00">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <button type="button" id="addSelectionBtn" class="w-full py-2 border border-dashed border-gray-300 rounded-md text-gray-500 hover:border-bet365-green hover:text-bet365-green transition-colors">
+                      + Add Another Selection
+                    </button>
+                  </div>
+                  
+                  <!-- Bet Details -->
+                  <div class="mb-6">
+                    <h3 class="font-medium mb-3 flex items-center">
+                      <span class="bg-bet365-green w-6 h-6 rounded-full text-white flex items-center justify-center mr-2">3</span>
+                      Bet Details
+                    </h3>
+                    <div class="grid grid-cols-2 gap-3">
+                      <div class="form-group">
+                        <label class="block text-sm font-medium mb-1">Stake</label>
+                        <div class="relative">
+                          <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">£</span>
+                          <input type="number" id="stakeInput" min="0.5" step="0.5" class="bet365-input pl-8" value="10">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label class="block text-sm font-medium mb-1">Currency</label>
+                        <select id="currencySelect" class="bet365-input">
+                          <option value="GBP">GBP (£)</option>
+                          <option value="EUR">EUR (€)</option>
+                          <option value="USD">USD ($)</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 mt-3">
+                      <div class="form-group">
+                        <label class="block text-sm font-medium mb-1">Bet Type</label>
+                        <select id="betTypeSelect" class="bet365-input">
+                          <option value="single">Single</option>
+                          <option value="multiple">Multiple</option>
+                          <option value="accumulator">Accumulator</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label class="block text-sm font-medium mb-1">Date Placed</label>
+                        <input type="datetime-local" id="placedAtInput" class="bet365-input">
+                      </div>
+                    </div>
+                    <div class="mt-3">
+                      <div class="form-group">
+                        <label class="block text-sm font-medium mb-1">Receipt Number</label>
+                        <input type="text" id="receiptInput" class="bet365-input" maxlength="8">
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Betslip Preview -->
+          <div class="w-full max-w-md mx-auto">
+            <div class="card shadow-md rounded-lg overflow-hidden mb-4 animate-fade-in">
+              <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                  <h2 class="text-xl font-semibold">Betslip Preview</h2>
+                  <div class="flex gap-2">
+                    <button id="downloadBtn" class="btn-outline">
+                      <span class="icon">↓</span>
+                      <span>Download</span>
+                    </button>
+                    
+                    <button id="shareBtn" class="btn-outline">
+                      <span class="icon">↗</span>
+                      <span>Share</span>
+                    </button>
+                  </div>
+                </div>
+                
+                <!-- Share buttons -->
+                <div id="shareButtonsContainer" class="mb-4 animate-fade-in hidden">
+                  <div class="flex flex-wrap gap-2">
+                    <button class="share-btn facebook">Facebook</button>
+                    <button class="share-btn twitter">Twitter</button>
+                    <button class="share-btn whatsapp">WhatsApp</button>
+                  </div>
+                </div>
+                
+                <div class="bg-white">
+                  <!-- Betslip Preview Content -->
+                  <div id="betslip-preview" class="betslip bg-white p-4 rounded-md border border-gray-200">
+                    <div class="betslip-header flex justify-between items-center mb-2">
+                      <div class="flex items-center">
+                        <span id="preview-bookmaker" class="text-xl font-bold">Your Bookmaker</span>
+                      </div>
+                      <div class="flex flex-col items-end">
+                        <span class="text-xs opacity-80">Receipt</span>
+                        <span id="preview-receipt" class="font-mono text-sm">ABC12345</span>
+                      </div>
+                    </div>
+                    
+                    <div class="betslip-content">
+                      <div class="flex justify-between text-xs text-gray-500 mb-2">
+                        <span id="preview-date">01/01/2023</span>
+                        <span id="preview-time">15:00</span>
+                      </div>
+                      
+                      <div class="bg-bet365-green bg-opacity-10 text-bet365-green px-2 py-1 text-sm rounded-sm inline-block mb-2" id="preview-bet-type">
+                        Single
+                      </div>
+                      
+                      <hr class="my-3">
+                      
+                      <div id="preview-selections">
+                        <!-- Selections will be populated dynamically -->
+                      </div>
+                      
+                      <hr class="my-3">
+                      
+                      <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                          <span class="text-sm">Stake</span>
+                          <span id="preview-stake" class="font-medium">£10.00</span>
+                        </div>
+                        
+                        <div id="preview-odds-container" class="flex justify-between items-center hidden">
+                          <span class="text-sm">Total Odds</span>
+                          <span id="preview-odds" class="font-medium">2.50</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                          <span class="text-sm font-semibold">Potential Returns</span>
+                          <span id="preview-returns" class="font-bold text-bet365-green">£25.00</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="betslip-footer mt-4">
+                      <div class="text-xs text-center text-gray-500">
+                        <p>This is a simulated betslip for entertainment purposes only.</p>
+                        <p id="preview-disclaimer">Not affiliated with Your Bookmaker.</p>
+                        <p class="mt-1">Generated at <span class="font-bold text-bet365-green">Betslip.fyi</span></p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <hr class="my-10">
+        
+        <!-- How To Section -->
+        <div class="mb-10 animate-fade-in">
+          <h2 class="text-2xl font-bold mb-6 text-center">How To Use This Tool</h2>
+          
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="card shadow-md hover:shadow-lg transition-shadow">
+              <div class="p-6">
+                <div class="flex items-center gap-4 mb-4">
+                  <div class="bg-soft-green p-3 rounded-full">
+                    <span class="h-6 w-6 text-bet365-green">✏️</span>
+                  </div>
+                  <h3 class="font-semibold text-lg">1. Create Your Betslip</h3>
+                </div>
+                <p class="text-gray-600">
+                  Enter your teams, markets, and selections. Add multiple selections for accumulators, or keep it simple with a single bet.
+                </p>
+                <div class="mt-4 flex items-center gap-2 text-sm text-gray-500">
+                  <span class="h-4 w-4">+</span>
+                  <span>Add as many selections as you want</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card shadow-md hover:shadow-lg transition-shadow">
+              <div class="p-6">
+                <div class="flex items-center gap-4 mb-4">
+                  <div class="bg-soft-green p-3 rounded-full">
+                    <span class="h-6 w-6 text-bet365-green">💰</span>
+                  </div>
+                  <h3 class="font-semibold text-lg">2. Set Stake & Details</h3>
+                </div>
+                <p class="text-gray-600">
+                  Choose your stake amount, currency, and bet type. Customize the receipt number and placement time.
+                </p>
+                <div class="mt-4 flex items-center gap-2 text-sm text-gray-500">
+                  <span class="h-4 w-4">🕒</span>
+                  <span>Set custom date and time</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card shadow-md hover:shadow-lg transition-shadow">
+              <div class="p-6">
+                <div class="flex items-center gap-4 mb-4">
+                  <div class="bg-soft-green p-3 rounded-full">
+                    <span class="h-6 w-6 text-bet365-green">🔄</span>
+                  </div>
+                  <h3 class="font-semibold text-lg">3. Share or Download</h3>
+                </div>
+                <p class="text-gray-600">
+                  Download your betslip as an image or share it directly to social media platforms like Facebook, Twitter, or WhatsApp.
+                </p>
+                <div class="mt-4 flex items-center gap-2 text-sm text-gray-500">
+                  <span class="h-4 w-4">⬇️</span>
+                  <span>Save as image for later use</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-8 p-6 bg-gray-50 rounded-lg border border-gray-100">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="h-5 w-5 text-bet365-green">🎲</span>
+              <h3 class="font-semibold">Important Note</h3>
+            </div>
+            <p class="text-gray-600">
+              This tool is for entertainment purposes only. The generated betslips are not real betting receipts and cannot be redeemed at any bookmaker. 
+              Share responsibly and remember that gambling should be fun and done in moderation.
+            </p>
+          </div>
+        </div>
+        
+        <div class="text-center text-gray-500 text-sm animate-fade-in">
+          <p class="mb-2">This tool is for entertainment purposes only. Not affiliated with bet365.</p>
+          <p>Created with ❤️ using plain HTML, CSS, and JavaScript.</p>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="script.js"></script>
+</body>
 </html>
