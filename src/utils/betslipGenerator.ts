@@ -154,12 +154,58 @@ export const downloadBetslip = async (elementId: string, filename: string): Prom
       throw new Error('Element not found');
     }
     
-    const canvas = await html2canvas(element, {
+    // Create a clone of the element to avoid modifying the original DOM
+    const clone = element.cloneNode(true) as HTMLElement;
+    
+    // Apply styles to ensure proper rendering
+    clone.style.position = 'fixed';
+    clone.style.top = '0';
+    clone.style.left = '0';
+    clone.style.width = element.offsetWidth + 'px';
+    clone.style.height = element.offsetHeight + 'px';
+    clone.style.zIndex = '-9999';
+    clone.style.backgroundColor = 'white'; // Ensure white background
+    
+    // Fix for backdrop-filter and opacity issues
+    const allElements = clone.querySelectorAll('*');
+    allElements.forEach((el) => {
+      const element = el as HTMLElement;
+      const computedStyle = window.getComputedStyle(element);
+      
+      // Remove any backdrop filters
+      if (computedStyle.backdropFilter) {
+        element.style.backdropFilter = 'none';
+      }
+      
+      // Fix opacity to 1
+      if (computedStyle.opacity !== '1') {
+        element.style.opacity = '1';
+      }
+      
+      // Ensure background colors are solid
+      if (computedStyle.backgroundColor && computedStyle.backgroundColor.includes('rgba')) {
+        // Convert rgba to rgb
+        const rgba = computedStyle.backgroundColor.match(/rgba?\((\d+), (\d+), (\d+),?(?:\s+)?(\d*\.?\d*)?\)/);
+        if (rgba) {
+          element.style.backgroundColor = `rgb(${rgba[1]}, ${rgba[2]}, ${rgba[3]})`;
+        }
+      }
+    });
+    
+    // Append to document, capture, then remove
+    document.body.appendChild(clone);
+    
+    const canvas = await html2canvas(clone, {
       scale: 2,
       logging: false,
       useCORS: true,
-      backgroundColor: '#ffffff'
+      backgroundColor: '#ffffff',
+      removeContainer: true,
+      // Disable transparency, fixes issues with opacity
+      allowTaint: true
     });
+    
+    document.body.removeChild(clone);
     
     const link = document.createElement('a');
     link.download = filename;
@@ -185,12 +231,58 @@ export const shareBetslip = async (elementId: string, title: string): Promise<vo
       throw new Error('Element not found');
     }
     
-    const canvas = await html2canvas(element, {
+    // Create a clone of the element to avoid modifying the original DOM
+    const clone = element.cloneNode(true) as HTMLElement;
+    
+    // Apply styles to ensure proper rendering
+    clone.style.position = 'fixed';
+    clone.style.top = '0';
+    clone.style.left = '0';
+    clone.style.width = element.offsetWidth + 'px';
+    clone.style.height = element.offsetHeight + 'px';
+    clone.style.zIndex = '-9999';
+    clone.style.backgroundColor = 'white'; // Ensure white background
+    
+    // Fix for backdrop-filter and opacity issues
+    const allElements = clone.querySelectorAll('*');
+    allElements.forEach((el) => {
+      const element = el as HTMLElement;
+      const computedStyle = window.getComputedStyle(element);
+      
+      // Remove any backdrop filters
+      if (computedStyle.backdropFilter) {
+        element.style.backdropFilter = 'none';
+      }
+      
+      // Fix opacity to 1
+      if (computedStyle.opacity !== '1') {
+        element.style.opacity = '1';
+      }
+      
+      // Ensure background colors are solid
+      if (computedStyle.backgroundColor && computedStyle.backgroundColor.includes('rgba')) {
+        // Convert rgba to rgb
+        const rgba = computedStyle.backgroundColor.match(/rgba?\((\d+), (\d+), (\d+),?(?:\s+)?(\d*\.?\d*)?\)/);
+        if (rgba) {
+          element.style.backgroundColor = `rgb(${rgba[1]}, ${rgba[2]}, ${rgba[3]})`;
+        }
+      }
+    });
+    
+    // Append to document, capture, then remove
+    document.body.appendChild(clone);
+    
+    const canvas = await html2canvas(clone, {
       scale: 2,
       logging: false,
       useCORS: true,
-      backgroundColor: '#ffffff'
+      backgroundColor: '#ffffff',
+      removeContainer: true,
+      // Disable transparency, fixes issues with opacity
+      allowTaint: true
     });
+    
+    document.body.removeChild(clone);
     
     canvas.toBlob(async (blob) => {
       if (!blob) {
