@@ -3,7 +3,15 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Download, Share, Check, Loader2 } from "lucide-react";
+import { 
+  Download, 
+  Share, 
+  Loader2, 
+  FacebookIcon, 
+  TwitterIcon, 
+  Share2Icon,
+  SendIcon
+} from "lucide-react";
 import { toast } from "sonner";
 import { 
   BetslipData, 
@@ -16,7 +24,10 @@ import {
   shareBetslip,
   getMarketDisplayText,
   getBookmakerDisplayName,
-  formatOdds
+  formatOdds,
+  generateBetslipImage,
+  shareOnSocialMedia,
+  getShareableImageUrl
 } from "@/utils/betslipGenerator";
 
 interface BetslipPreviewProps {
@@ -26,6 +37,8 @@ interface BetslipPreviewProps {
 const BetslipPreview: React.FC<BetslipPreviewProps> = ({ betslip }) => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
+  const [showSocialButtons, setShowSocialButtons] = useState(false);
+  const [isSharingToSocial, setIsSharingToSocial] = useState<string | null>(null);
   
   const totalOdds = calculateTotalOdds(betslip.selections);
   const totalReturns = calculateReturns(betslip.stake, totalOdds);
@@ -48,13 +61,43 @@ const BetslipPreview: React.FC<BetslipPreviewProps> = ({ betslip }) => {
     try {
       setIsSharing(true);
       const bookmakerName = getBookmakerDisplayName(betslip);
-      await shareBetslip('betslip-preview', `My ${bookmakerName} Betslip`);
-      toast.success("Betslip shared successfully");
+      
+      if (navigator.share) {
+        await shareBetslip('betslip-preview', `My ${bookmakerName} Betslip`);
+        toast.success("Betslip shared successfully");
+      } else {
+        // If Web Share API is not supported, show social sharing buttons
+        setShowSocialButtons(!showSocialButtons);
+      }
     } catch (error) {
       console.error('Share error:', error);
       toast.error("Failed to share betslip");
     } finally {
       setIsSharing(false);
+    }
+  };
+  
+  const handleSocialShare = async (platform: 'facebook' | 'twitter' | 'reddit' | 'whatsapp') => {
+    try {
+      setIsSharingToSocial(platform);
+      const bookmakerName = getBookmakerDisplayName(betslip);
+      
+      // Generate the image
+      const imageDataUrl = await generateBetslipImage('betslip-preview');
+      
+      // Get a shareable URL (in a real app, this would upload the image to a server)
+      const shareableUrl = await getShareableImageUrl(imageDataUrl);
+      
+      // Share to the selected platform
+      const shareText = `Check out my ${bookmakerName} betslip!`;
+      shareOnSocialMedia(platform, shareableUrl, shareText);
+      
+      toast.success(`Sharing to ${platform}`);
+    } catch (error) {
+      console.error(`${platform} share error:`, error);
+      toast.error(`Failed to share to ${platform}`);
+    } finally {
+      setIsSharingToSocial(null);
     }
   };
 
@@ -86,29 +129,89 @@ const BetslipPreview: React.FC<BetslipPreviewProps> = ({ betslip }) => {
                   </>
                 )}
               </Button>
-              {isShareSupported && (
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={handleShare}
-                  disabled={isSharing}
-                  className="flex items-center gap-1"
-                >
-                  {isSharing ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      <span>Sharing...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Share className="h-4 w-4" />
-                      <span>Share</span>
-                    </>
-                  )}
-                </Button>
-              )}
+              
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleShare}
+                disabled={isSharing}
+                className="flex items-center gap-1"
+              >
+                {isSharing ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>Sharing...</span>
+                  </>
+                ) : (
+                  <>
+                    <Share className="h-4 w-4" />
+                    <span>{isShareSupported ? "Share" : "Social"}</span>
+                  </>
+                )}
+              </Button>
             </div>
           </div>
+          
+          {/* Social media sharing buttons */}
+          {showSocialButtons && !isShareSupported && (
+            <div className="flex justify-end gap-2 mb-4 animate-fade-in">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleSocialShare('facebook')}
+                disabled={isSharingToSocial !== null}
+                className="bg-[#1877F2] text-white hover:bg-[#1877F2]/90"
+              >
+                {isSharingToSocial === 'facebook' ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <FacebookIcon className="h-4 w-4" />
+                )}
+              </Button>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleSocialShare('twitter')}
+                disabled={isSharingToSocial !== null}
+                className="bg-[#1DA1F2] text-white hover:bg-[#1DA1F2]/90"
+              >
+                {isSharingToSocial === 'twitter' ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <TwitterIcon className="h-4 w-4" />
+                )}
+              </Button>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleSocialShare('reddit')}
+                disabled={isSharingToSocial !== null}
+                className="bg-[#FF4500] text-white hover:bg-[#FF4500]/90"
+              >
+                {isSharingToSocial === 'reddit' ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Share2Icon className="h-4 w-4" />
+                )}
+              </Button>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleSocialShare('whatsapp')}
+                disabled={isSharingToSocial !== null}
+                className="bg-[#25D366] text-white hover:bg-[#25D366]/90"
+              >
+                {isSharingToSocial === 'whatsapp' ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <SendIcon className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+          )}
           
           <div className="bg-white">
             <CustomBetslipPreview betslip={betslip} totalOdds={totalOdds} totalReturns={totalReturns} />

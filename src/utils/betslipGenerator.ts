@@ -178,8 +178,8 @@ export const calculateTotalOdds = (selections: BetSelection[]): number => {
   }, 1).toFixed(2));
 };
 
-// Convert betslip to image and download
-export const downloadBetslip = async (elementId: string, filename: string): Promise<void> => {
+// Generate image data URL from betslip element
+export const generateBetslipImage = async (elementId: string): Promise<string> => {
   try {
     const element = document.getElementById(elementId);
     if (!element) {
@@ -203,6 +203,18 @@ export const downloadBetslip = async (elementId: string, filename: string): Prom
 
     // Remove the class after capturing
     element.classList.remove('capturing');
+    
+    return dataUrl;
+  } catch (error) {
+    console.error('Error generating image:', error);
+    throw error;
+  }
+};
+
+// Convert betslip to image and download
+export const downloadBetslip = async (elementId: string, filename: string): Promise<void> => {
+  try {
+    const dataUrl = await generateBetslipImage(elementId);
 
     const link = document.createElement('a');
     link.download = filename;
@@ -211,7 +223,8 @@ export const downloadBetslip = async (elementId: string, filename: string): Prom
     link.click();
     document.body.removeChild(link);
   } catch (error) {
-    console.error('Error generating image:', error);
+    console.error('Error downloading betslip:', error);
+    throw error;
   }
 };
 
@@ -222,29 +235,8 @@ export const shareBetslip = async (elementId: string, title: string): Promise<vo
       throw new Error('Web Share API not supported');
     }
 
-    const element = document.getElementById(elementId);
-    if (!element) {
-      throw new Error('Element not found');
-    }
-
-    // Add a class to properly style for image capture
-    element.classList.add('capturing');
-
-    const dataUrl = await toPng(element, {
-      quality: 1.0,
-      pixelRatio: 2,
-      backgroundColor: '#ffffff',
-      style: {
-        margin: '0',
-        padding: '20px',
-        boxShadow: 'none',
-        border: 'none',
-      }
-    });
-
-    // Remove the class after capturing
-    element.classList.remove('capturing');
-
+    const dataUrl = await generateBetslipImage(elementId);
+    
     const response = await fetch(dataUrl);
     const blob = await response.blob();
     const file = new File([blob], 'betslip.png', { type: 'image/png' });
@@ -255,5 +247,44 @@ export const shareBetslip = async (elementId: string, title: string): Promise<vo
     });
   } catch (error) {
     console.error('Error sharing betslip:', error);
+    throw error;
   }
+};
+
+// Share betslip on social media platforms
+export const shareOnSocialMedia = (platform: 'facebook' | 'twitter' | 'reddit' | 'whatsapp', imageUrl: string, text: string): void => {
+  let shareUrl = '';
+  
+  switch (platform) {
+    case 'facebook':
+      shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(imageUrl)}`;
+      break;
+    case 'twitter':
+      shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(imageUrl)}&text=${encodeURIComponent(text)}`;
+      break;
+    case 'reddit':
+      shareUrl = `https://www.reddit.com/submit?url=${encodeURIComponent(imageUrl)}&title=${encodeURIComponent(text)}`;
+      break;
+    case 'whatsapp':
+      shareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text + ' ' + imageUrl)}`;
+      break;
+  }
+  
+  window.open(shareUrl, '_blank', 'noopener,noreferrer');
+};
+
+// Generate a temporary publicly accessible URL for the betslip image
+// Note: In a real app, you would upload to a server and get a URL
+// This is a simplified version for demonstration
+export const getShareableImageUrl = async (dataUrl: string): Promise<string> => {
+  // In a real app, we would upload the image to a server here
+  // For demo purposes, we're using the data URL directly, which isn't ideal for sharing
+  // but works for demonstration
+  
+  // For a production app, you would:
+  // 1. Convert dataUrl to a File/Blob
+  // 2. Upload to your server or a service like AWS S3, Cloudinary, etc.
+  // 3. Return the public URL
+  
+  return dataUrl;
 };
