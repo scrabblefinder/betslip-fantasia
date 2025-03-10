@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -60,18 +59,27 @@ const BetslipPreview: React.FC<BetslipPreviewProps> = ({ betslip }) => {
   const handleShare = async () => {
     try {
       setIsSharing(true);
-      const bookmakerName = getBookmakerDisplayName(betslip);
       
-      if (navigator.share) {
-        await shareBetslip('betslip-preview', `My ${bookmakerName} Betslip`);
-        toast.success("Betslip shared successfully");
-      } else {
-        // If Web Share API is not supported, show social sharing buttons
-        setShowSocialButtons(!showSocialButtons);
+      // Always show social sharing buttons instead of trying to use the Web Share API
+      // This is more reliable across devices and browsers
+      setShowSocialButtons(!showSocialButtons);
+      
+      // Only attempt native sharing on mobile devices where it's more likely to be supported
+      if (navigator.share && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+        try {
+          const bookmakerName = getBookmakerDisplayName(betslip);
+          await shareBetslip('betslip-preview', `My ${bookmakerName} Betslip`);
+          toast.success("Betslip shared successfully");
+          setShowSocialButtons(false); // Hide social buttons if native sharing worked
+        } catch (shareError) {
+          console.error('Native share error:', shareError);
+          // If native sharing fails, we'll show the social buttons (already set above)
+          // No need to show an error toast as we're falling back to social buttons
+        }
       }
     } catch (error) {
       console.error('Share error:', error);
-      toast.error("Failed to share betslip");
+      // No error toast here as we're showing social buttons instead
     } finally {
       setIsSharing(false);
     }
@@ -92,7 +100,7 @@ const BetslipPreview: React.FC<BetslipPreviewProps> = ({ betslip }) => {
       const shareText = `Check out my ${bookmakerName} betslip!`;
       shareOnSocialMedia(platform, shareableUrl, shareText);
       
-      toast.success(`Sharing to ${platform}`);
+      toast.success(`Opening ${platform} to share your betslip`);
     } catch (error) {
       console.error(`${platform} share error:`, error);
       toast.error(`Failed to share to ${platform}`);
@@ -101,7 +109,9 @@ const BetslipPreview: React.FC<BetslipPreviewProps> = ({ betslip }) => {
     }
   };
 
-  const isShareSupported = typeof navigator !== 'undefined' && !!navigator.share;
+  // We'll check for share support, but default to showing social buttons in most cases
+  const isShareSupported = typeof navigator !== 'undefined' && !!navigator.share && 
+                           /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   
   return (
     <div className="w-full max-w-md mx-auto">
@@ -153,7 +163,7 @@ const BetslipPreview: React.FC<BetslipPreviewProps> = ({ betslip }) => {
           </div>
           
           {/* Social media sharing buttons */}
-          {showSocialButtons && !isShareSupported && (
+          {showSocialButtons && (
             <div className="flex justify-end gap-2 mb-4 animate-fade-in">
               <Button
                 variant="outline"

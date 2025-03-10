@@ -228,25 +228,38 @@ export const downloadBetslip = async (elementId: string, filename: string): Prom
   }
 };
 
-// Share betslip (for mobile devices)
+// Improved share betslip function (for mobile devices)
 export const shareBetslip = async (elementId: string, title: string): Promise<void> => {
   try {
+    // Check if Web Share API is supported and available
     if (!navigator.share) {
       throw new Error('Web Share API not supported');
     }
 
     const dataUrl = await generateBetslipImage(elementId);
     
-    const response = await fetch(dataUrl);
-    const blob = await response.blob();
-    const file = new File([blob], 'betslip.png', { type: 'image/png' });
+    // Check if can share files (not all devices support file sharing)
+    if (navigator.canShare && navigator.canShare({ files: [new File([new Blob()], 'test.txt')] })) {
+      const response = await fetch(dataUrl);
+      const blob = await response.blob();
+      const file = new File([blob], 'betslip.png', { type: 'image/png' });
 
-    await navigator.share({
-      title,
-      files: [file]
-    });
+      await navigator.share({
+        title,
+        files: [file]
+      });
+    } else {
+      // Fallback to sharing just text/url if file sharing not supported
+      await navigator.share({
+        title,
+        text: 'Check out my betslip!',
+        // In a real app, you'd upload the image somewhere and share the URL
+        url: window.location.href
+      });
+    }
   } catch (error) {
     console.error('Error sharing betslip:', error);
+    // We're now explicitly throwing the error so it can be handled by the caller
     throw error;
   }
 };
