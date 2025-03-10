@@ -73,7 +73,8 @@ export default {
 					yellow: '#ffdf1b',
 					black: '#000000',
 					white: '#ffffff',
-				}
+				},
+				'soft-green': '#F2FCE2'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
