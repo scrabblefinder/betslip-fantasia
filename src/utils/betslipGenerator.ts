@@ -30,10 +30,12 @@ export const calculateReturns = (stake: number, odds: number): number => {
   return parseFloat((stake * odds).toFixed(2));
 };
 
-// Format currency 
+// Format currency with support for multiple currencies
 export const formatCurrency = (amount: number, currency: string = "GBP"): string => {
   const currencyMap: Record<string, string> = {
-    "GBP": "GBP"
+    "GBP": "GBP",
+    "USD": "USD",
+    "EUR": "EUR"
   };
   
   return new Intl.NumberFormat('en-GB', {
@@ -85,7 +87,7 @@ export interface BetSelection {
   homeTeam: string;
   awayTeam: string;
   market: string;
-  customMarket?: string; // Field for custom market text
+  customMarket?: string;
   selection: string;
   odds: number;
   eventDate: Date;
@@ -100,13 +102,13 @@ export type OddsFormat = 'decimal' | 'american';
 export interface BetslipData {
   selections: BetSelection[];
   stake: number;
-  betType: string; // single, double, accumulator
+  betType: string;
   placedAt: Date;
   receiptNumber: string;
   bookmaker: Bookmaker;
-  customBookmakerName: string; // No longer optional
+  customBookmakerName: string;
   currency: string;
-  oddsFormat: OddsFormat; // New field for odds format
+  oddsFormat: OddsFormat;
 }
 
 // Create a blank betslip with default values
@@ -118,9 +120,9 @@ export const createBlankBetslip = (): BetslipData => {
     placedAt: new Date(),
     receiptNumber: generateReceiptNumber(),
     bookmaker: 'custom',
-    customBookmakerName: 'Your Bookmaker', // Default name
+    customBookmakerName: 'Your Bookmaker',
     currency: 'GBP',
-    oddsFormat: 'decimal' // Default odds format
+    oddsFormat: 'decimal'
   };
 };
 
@@ -256,7 +258,7 @@ export const downloadBetslip = async (elementId: string, filename: string): Prom
     
     // Use html2canvas with enhanced settings
     const canvas = await html2canvas(clone, {
-      scale: 3, // Higher scale for better quality
+      scale: 3,
       useCORS: true,
       backgroundColor: '#ffffff',
       allowTaint: true,
@@ -266,7 +268,6 @@ export const downloadBetslip = async (elementId: string, filename: string): Prom
       onclone: (clonedDoc) => {
         const cloneInDoc = clonedDoc.body.querySelector(`#${elementId}`);
         if (cloneInDoc) {
-          // Apply additional fixes to the cloned document
           const allTextElems = cloneInDoc.querySelectorAll('*');
           allTextElems.forEach((el) => {
             const element = el as HTMLElement;
@@ -376,7 +377,7 @@ export const shareBetslip = async (elementId: string, title: string): Promise<vo
     
     // Use html2canvas with enhanced settings
     const canvas = await html2canvas(clone, {
-      scale: 3, // Higher scale for better quality
+      scale: 3,
       useCORS: true,
       backgroundColor: '#ffffff',
       allowTaint: true,
@@ -386,7 +387,6 @@ export const shareBetslip = async (elementId: string, title: string): Promise<vo
       onclone: (clonedDoc) => {
         const cloneInDoc = clonedDoc.body.querySelector(`#${elementId}`);
         if (cloneInDoc) {
-          // Apply additional fixes to the cloned document
           const allTextElems = cloneInDoc.querySelectorAll('*');
           allTextElems.forEach((el) => {
             const element = el as HTMLElement;

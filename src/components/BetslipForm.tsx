@@ -94,6 +94,13 @@ const BetslipForm: React.FC<BetslipFormProps> = ({ betslip, onBetslipChange }) =
     });
   };
 
+  const handleCurrencyChange = (currency: string) => {
+    onBetslipChange({
+      ...betslip,
+      currency
+    });
+  };
+
   return (
     <Card className="w-full max-w-md mx-auto animate-fade-in">
       <CardContent className="p-6">
@@ -253,16 +260,28 @@ const BetslipForm: React.FC<BetslipFormProps> = ({ betslip, onBetslipChange }) =
           <TabsContent value="stake">
             <div className="space-y-4">
               <div>
-                <Label htmlFor="stake" className="text-sm font-medium">Stake Amount (£)</Label>
-                <Input
-                  id="stake"
-                  type="number"
-                  min="0.1"
-                  step="0.1"
-                  value={betslip.stake}
-                  onChange={(e) => handleStakeChange(e.target.value)}
-                  className="text-lg"
-                />
+                <Label htmlFor="stake" className="text-sm font-medium">Stake Amount</Label>
+                <div className="flex gap-2">
+                  <Select value={betslip.currency} onValueChange={handleCurrencyChange}>
+                    <SelectTrigger className="w-24">
+                      <SelectValue placeholder="Currency" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="GBP">GBP (£)</SelectItem>
+                      <SelectItem value="USD">USD ($)</SelectItem>
+                      <SelectItem value="EUR">EUR (€)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    id="stake"
+                    type="number"
+                    min="0.1"
+                    step="0.1"
+                    value={betslip.stake}
+                    onChange={(e) => handleStakeChange(e.target.value)}
+                    className="flex-1 text-lg"
+                  />
+                </div>
               </div>
 
               <div>
@@ -333,3 +352,4 @@ const BetslipForm: React.FC<BetslipFormProps> = ({ betslip, onBetslipChange }) =
 };
 
 export default BetslipForm;
+

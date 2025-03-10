@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -80,7 +79,6 @@ interface BetslipContentProps {
   totalReturns: number;
 }
 
-// Renamed from Bet365BetslipPreview to CustomBetslipPreview
 const CustomBetslipPreview: React.FC<BetslipContentProps> = ({ betslip, totalOdds, totalReturns }) => {
   const bookmakerName = getBookmakerDisplayName(betslip);
   
