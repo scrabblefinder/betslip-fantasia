@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -190,7 +191,7 @@ const CustomBetslipPreview: React.FC<BetslipContentProps> = ({ betslip, totalOdd
         <div className="text-xs text-center text-gray-500">
           <p>This is a simulated betslip for entertainment purposes only.</p>
           <p>Not affiliated with {bookmakerName}.</p>
-          <p className="mt-1">Generated at Betslip.fyi</p>
+          <p className="mt-1">Generated at <span className="font-bold text-bet365-green">Betslip.fyi</span></p>
         </div>
       </div>
     </div>
