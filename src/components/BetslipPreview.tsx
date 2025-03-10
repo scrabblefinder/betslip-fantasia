@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -160,6 +161,16 @@ const Bet365BetslipPreview: React.FC<BetslipContentProps> = ({ betslip, totalOdd
 const DraftKingsBetslipPreview: React.FC<BetslipContentProps> = ({ betslip, totalOdds, totalReturns }) => {
   return (
     <div id="betslip-preview" className="betslip dk-betslip">
+      <div className="dk-betslip-header">
+        <div className="flex items-center justify-between py-2 px-4">
+          <span className="text-xl font-bold text-white">DraftKings</span>
+          <div className="flex flex-col items-end">
+            <span className="text-xs text-gray-400">Receipt</span>
+            <span className="font-mono text-sm text-white">{betslip.receiptNumber}</span>
+          </div>
+        </div>
+      </div>
+      
       <div className="dk-betslip-content">
         <div className="dk-selections">
           {betslip.selections.map((selection, index) => (
@@ -171,11 +182,21 @@ const DraftKingsBetslipPreview: React.FC<BetslipContentProps> = ({ betslip, tota
                   </div>
                   <div className="dk-selection-title">{selection.selection}</div>
                 </div>
-                <div className="dk-odds">−{Math.round(100 / (selection.odds - 1))}</div>
+                <div className="dk-odds">
+                  {selection.odds >= 2 ? 
+                    `+${Math.round((selection.odds - 1) * 100)}` : 
+                    `−${Math.round(100 / (selection.odds - 1))}`}
+                </div>
               </div>
-              <div className="dk-selection-subtitle">MONEYLINE</div>
-              <div className="dk-selection-matchup">{selection.homeTeam} @ {selection.awayTeam} (Today {formatTime(selection.eventDate)})</div>
-              <div className="dk-selection-result">Result: {Math.floor(Math.random() * 100)} : {Math.floor(Math.random() * 100)}</div>
+              <div className="dk-selection-subtitle">
+                {selection.market.toUpperCase()}
+              </div>
+              <div className="dk-selection-matchup">
+                {selection.homeTeam} vs {selection.awayTeam} • {formatTime(selection.eventDate)}
+              </div>
+              {betslip.betType !== 'single' && (
+                <div className="dk-selection-result">Result: {Math.floor(Math.random() * 100)} : {Math.floor(Math.random() * 100)}</div>
+              )}
             </div>
           ))}
         </div>
@@ -189,7 +210,11 @@ const DraftKingsBetslipPreview: React.FC<BetslipContentProps> = ({ betslip, tota
           {betslip.selections.length > 1 && (
             <div className="flex justify-between items-center">
               <span className="text-sm">Total Odds</span>
-              <span className="font-medium">{totalOdds > 2 ? `+${Math.round((totalOdds - 1) * 100)}` : `−${Math.round(100 / (totalOdds - 1))}`}</span>
+              <span className="font-medium">
+                {totalOdds >= 2 ? 
+                  `+${Math.round((totalOdds - 1) * 100)}` : 
+                  `−${Math.round(100 / (totalOdds - 1))}`}
+              </span>
             </div>
           )}
           
