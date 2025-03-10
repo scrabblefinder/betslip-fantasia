@@ -14,7 +14,8 @@ import {
   downloadBetslip,
   shareBetslip,
   getMarketDisplayText,
-  getBookmakerDisplayName
+  getBookmakerDisplayName,
+  formatOdds
 } from "@/utils/betslipGenerator";
 
 interface BetslipPreviewProps {
@@ -113,7 +114,7 @@ const CustomBetslipPreview: React.FC<BetslipContentProps> = ({ betslip, totalOdd
               <span className="text-xs text-gray-500">
                 {formatDate(selection.eventDate)} {formatTime(selection.eventDate)}
               </span>
-              <span className="font-semibold">{selection.odds.toFixed(2)}</span>
+              <span className="font-semibold">{formatOdds(selection.odds, betslip.oddsFormat)}</span>
             </div>
             
             <div className="font-medium mb-1">
@@ -138,7 +139,7 @@ const CustomBetslipPreview: React.FC<BetslipContentProps> = ({ betslip, totalOdd
           {betslip.selections.length > 1 && (
             <div className="flex justify-between items-center">
               <span className="text-sm">Total Odds</span>
-              <span className="font-medium">{totalOdds.toFixed(2)}</span>
+              <span className="font-medium">{formatOdds(totalOdds, betslip.oddsFormat)}</span>
             </div>
           )}
           

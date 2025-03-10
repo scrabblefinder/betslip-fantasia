@@ -7,7 +7,15 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Trash, Plus, RefreshCw } from "lucide-react";
-import { BetslipData, BetSelection, Bookmaker, addSelection, removeSelection, createBlankBetslip } from "@/utils/betslipGenerator";
+import { 
+  BetslipData, 
+  BetSelection, 
+  Bookmaker, 
+  OddsFormat,
+  addSelection, 
+  removeSelection, 
+  createBlankBetslip 
+} from "@/utils/betslipGenerator";
 
 interface BetslipFormProps {
   betslip: BetslipData;
@@ -68,7 +76,6 @@ const BetslipForm: React.FC<BetslipFormProps> = ({ betslip, onBetslipChange }) =
       ...betslip,
       bookmaker,
       currency: 'GBP',
-      // Clear the custom name if switching back to bet365
       customBookmakerName: bookmaker === 'bet365' ? undefined : betslip.customBookmakerName
     });
   };
@@ -77,6 +84,13 @@ const BetslipForm: React.FC<BetslipFormProps> = ({ betslip, onBetslipChange }) =
     onBetslipChange({
       ...betslip,
       customBookmakerName: name
+    });
+  };
+
+  const handleOddsFormatChange = (format: OddsFormat) => {
+    onBetslipChange({
+      ...betslip,
+      oddsFormat: format
     });
   };
 
@@ -198,7 +212,7 @@ const BetslipForm: React.FC<BetslipFormProps> = ({ betslip, onBetslipChange }) =
                         />
                       </div>
                       <div>
-                        <Label htmlFor={`odds-${selection.id}`} className="text-xs">Odds</Label>
+                        <Label htmlFor={`odds-${selection.id}`} className="text-xs">Odds {betslip.oddsFormat === 'decimal' ? '(Decimal)' : '(American)'}</Label>
                         <Input
                           id={`odds-${selection.id}`}
                           type="number"
@@ -287,6 +301,19 @@ const BetslipForm: React.FC<BetslipFormProps> = ({ betslip, onBetslipChange }) =
                   value={betslip.placedAt instanceof Date ? betslip.placedAt.toISOString().slice(0, 16) : ''}
                   onChange={(e) => onBetslipChange({...betslip, placedAt: new Date(e.target.value)})}
                 />
+              </div>
+
+              <div>
+                <Label htmlFor="odds-format" className="text-sm font-medium">Odds Format</Label>
+                <Select value={betslip.oddsFormat} onValueChange={(value) => handleOddsFormatChange(value as OddsFormat)}>
+                  <SelectTrigger id="odds-format">
+                    <SelectValue placeholder="Select Odds Format" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="decimal">Decimal (1.75)</SelectItem>
+                    <SelectItem value="american">American (-133, +150)</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </TabsContent>

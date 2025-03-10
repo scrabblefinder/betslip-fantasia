@@ -43,6 +43,43 @@ export const formatCurrency = (amount: number, currency: string = "GBP"): string
   }).format(amount);
 };
 
+// Convert decimal odds to American odds
+export const decimalToAmerican = (decimalOdds: number): string => {
+  if (decimalOdds === 1) return "0";
+  
+  if (decimalOdds >= 2) {
+    // Positive American odds (underdog)
+    return "+" + Math.round((decimalOdds - 1) * 100);
+  } else {
+    // Negative American odds (favorite)
+    return Math.round(-100 / (decimalOdds - 1)).toString();
+  }
+};
+
+// Convert American odds to decimal odds
+export const americanToDecimal = (americanOdds: string): number => {
+  const odds = parseInt(americanOdds);
+  
+  if (odds === 0) return 1;
+  
+  if (odds > 0) {
+    // Positive American odds (underdog)
+    return parseFloat(((odds / 100) + 1).toFixed(2));
+  } else {
+    // Negative American odds (favorite)
+    return parseFloat(((-100 / odds) + 1).toFixed(2));
+  }
+};
+
+// Format odds based on selected format
+export const formatOdds = (decimalOdds: number, format: OddsFormat): string => {
+  if (format === 'decimal') {
+    return decimalOdds.toFixed(2);
+  } else {
+    return decimalToAmerican(decimalOdds);
+  }
+};
+
 export interface BetSelection {
   id: string;
   homeTeam: string;
@@ -57,6 +94,9 @@ export interface BetSelection {
 // Update Bookmaker type to only have 'custom'
 export type Bookmaker = 'custom';
 
+// Add OddsFormat type
+export type OddsFormat = 'decimal' | 'american';
+
 export interface BetslipData {
   selections: BetSelection[];
   stake: number;
@@ -66,6 +106,7 @@ export interface BetslipData {
   bookmaker: Bookmaker;
   customBookmakerName: string; // No longer optional
   currency: string;
+  oddsFormat: OddsFormat; // New field for odds format
 }
 
 // Create a blank betslip with default values
@@ -78,7 +119,8 @@ export const createBlankBetslip = (): BetslipData => {
     receiptNumber: generateReceiptNumber(),
     bookmaker: 'custom',
     customBookmakerName: 'Your Bookmaker', // Default name
-    currency: 'GBP'
+    currency: 'GBP',
+    oddsFormat: 'decimal' // Default odds format
   };
 };
 
