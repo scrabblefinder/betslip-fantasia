@@ -248,11 +248,8 @@ const BetMGMBetslipPreview: React.FC<BetslipContentProps> = ({ betslip, totalOdd
   return (
     <div id="betslip-preview" className="betslip mgm-betslip rounded-lg border border-gray-200 overflow-hidden">
       {/* Header */}
-      <div className="mgm-betslip-header bg-gray-100 p-4 flex justify-between items-center">
-        <h3 className="text-3xl font-semibold text-gray-700">My Bets</h3>
-        <div className="border rounded-full px-6 py-2">
-          <span className="text-gray-600 text-xl">Close</span>
-        </div>
+      <div className="mgm-betslip-header bg-gray-100 p-4 flex justify-center items-center">
+        <h3 className="text-3xl font-semibold text-gray-700 text-center">My Bets</h3>
       </div>
       
       {/* Tabs */}
@@ -272,8 +269,8 @@ const BetMGMBetslipPreview: React.FC<BetslipContentProps> = ({ betslip, totalOdd
       <div className="mgm-betslip-content p-4">
         <div className="flex justify-between items-center mb-2">
           <div className="flex items-center">
-            <div className="bg-amber-100 rounded-lg border border-amber-200 p-1 mr-2">
-              <span className="font-bold">SGP</span>
+            <div className="bg-amber-100 rounded-lg border border-amber-200 p-1 px-2 mr-2">
+              <span className="font-bold text-amber-800">SGP</span>
             </div>
             <span className="text-2xl font-bold">{numSelections} {numSelections === 1 ? 'Leg' : 'Legs'}</span>
           </div>
@@ -296,20 +293,20 @@ const BetMGMBetslipPreview: React.FC<BetslipContentProps> = ({ betslip, totalOdd
         
         {/* Selections */}
         {betslip.selections.map((selection, index) => (
-          <div key={selection.id} className="mgm-selection mb-3">
+          <div key={selection.id} className="mgm-selection mb-5 pb-2 border-b border-gray-200 last:border-b-0">
             <div className="flex items-center">
               <div className="w-6 h-6 rounded-full border border-gray-300 flex-shrink-0 mr-4"></div>
               <div className="text-xl font-bold">
                 {getMarketDisplayText(selection)}
               </div>
             </div>
-            <div className="ml-10 text-xl font-bold">
+            <div className="ml-10 text-xl font-bold mt-1">
               {selection.selection}
             </div>
-            <div className="ml-10 text-lg mt-1">
-              {selection.homeTeam} - {selection.awayTeam}
+            <div className="ml-10 text-lg mt-2">
+              <span className="font-medium">{selection.homeTeam}</span> - <span className="font-medium">{selection.awayTeam}</span>
             </div>
-            <div className="ml-10 text-lg text-gray-600">
+            <div className="ml-10 text-lg text-gray-600 mt-1">
               {formatDateBetMGM(selection.eventDate)} • {formatTimeBetMGM(selection.eventDate)}
             </div>
           </div>
@@ -317,7 +314,7 @@ const BetMGMBetslipPreview: React.FC<BetslipContentProps> = ({ betslip, totalOdd
         
         {/* Stake and Payout */}
         <div className="border-t border-b py-4 my-4">
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center mb-2">
             <span className="text-gray-600 text-xl">Stake:</span>
             <span className="text-2xl font-bold">${betslip.stake.toFixed(2)}</span>
           </div>
@@ -329,7 +326,7 @@ const BetMGMBetslipPreview: React.FC<BetslipContentProps> = ({ betslip, totalOdd
         </div>
         
         {/* Cash Out Section */}
-        <div className="bg-gray-200 rounded-lg p-4 text-center text-gray-500 text-xl mb-2">
+        <div className="bg-gray-200 rounded-lg p-4 text-center text-gray-500 text-xl mb-3">
           Cash Out Unavailable
         </div>
         
