@@ -1,129 +1,159 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { Share, Facebook, Twitter, Mail, MessageSquare } from "lucide-react";
 
 interface ShareButtonsProps {
   imageUrl: string;
 }
 
-// Add type definition for the ShareThis library
-declare global {
-  interface Window {
-    __sharethis__: {
-      load: (product: string, options: any) => void;
-    };
-  }
-}
-
 const ShareButtons: React.FC<ShareButtonsProps> = ({ imageUrl }) => {
-  useEffect(() => {
-    // For ShareThis to work properly, we need a public URL for the image
-    // Since we're using a data URL, we'll create a temporary blob URL which works better
-    // for some sharing scenarios (but still has limitations)
-    
-    let blobUrl = '';
-    
-    // Convert data URL to Blob URL for better compatibility
-    const convertDataUrlToBlob = async (dataUrl: string) => {
-      try {
-        const response = await fetch(dataUrl);
+  // Function to share via Web Share API (for mobile devices)
+  const handleNativeShare = async () => {
+    try {
+      // Check if Web Share API is available
+      if (navigator.share) {
+        // Convert data URL to blob for sharing
+        const response = await fetch(imageUrl);
         const blob = await response.blob();
-        return URL.createObjectURL(blob);
-      } catch (error) {
-        console.error('Error converting data URL to blob:', error);
-        return '';
-      }
-    };
-    
-    const setupShareButtons = async () => {
-      try {
-        // Convert to blob URL if possible
-        blobUrl = await convertDataUrlToBlob(imageUrl);
+        const file = new File([blob], 'betslip.png', { type: 'image/png' });
         
-        const shareUrl = window.location.href;
-        const shareTitle = "Check out my betslip!";
-        
-        // Check if ShareThis is already initialized
-        if (window.__sharethis__) {
-          window.__sharethis__.load('inline-share-buttons', {
-            alignment: 'center',
-            id: 'my-share-buttons-container',
-            enabled: true,
-            font_size: 11,
-            padding: 8,
-            radius: 4,
-            networks: ['facebook', 'twitter', 'whatsapp', 'email', 'sms', 'sharethis'],
-            size: 32,
-            show_mobile_buttons: true,
-            url: shareUrl, // Use the page URL for sharing
-            title: shareTitle,
-            description: 'Check out my betslip!',
-            image: blobUrl || imageUrl // Use blob URL if available, fall back to data URL
+        // Try to share the file
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            title: "Check out my betslip!",
+            files: [file]
           });
         } else {
-          // If ShareThis isn't loaded yet, initialize it
-          const script = document.createElement('script');
-          script.src = 'https://platform-api.sharethis.com/js/sharethis.js#property=67cf2a0f6eb4310012fddafd&product=inline-share-buttons';
-          script.async = true;
-          script.onload = () => {
-            if (window.__sharethis__) {
-              window.__sharethis__.load('inline-share-buttons', {
-                alignment: 'center',
-                id: 'my-share-buttons-container',
-                enabled: true,
-                font_size: 11,
-                padding: 8,
-                radius: 4,
-                networks: ['facebook', 'twitter', 'whatsapp', 'email', 'sms', 'sharethis'],
-                size: 32,
-                show_mobile_buttons: true,
-                url: shareUrl, // Use the page URL for sharing
-                title: shareTitle,
-                description: 'Check out my betslip!',
-                image: blobUrl || imageUrl // Use blob URL if available, fall back to data URL
-              });
-            }
-          };
-          
-          document.body.appendChild(script);
+          // Fallback to sharing just text/url
+          await navigator.share({
+            title: "Check out my betslip!",
+            text: "Check out my betslip!",
+            url: window.location.href
+          });
         }
-      } catch (error) {
-        console.error('Error setting up share buttons:', error);
+      } else {
+        // Fallback for browsers that don't support Web Share API
+        toast.info("Direct sharing not supported in this browser. You can download the image instead.");
       }
-    };
-    
-    setupShareButtons();
-    
-    return () => {
-      // Cleanup when component unmounts
-      if (blobUrl) {
-        URL.revokeObjectURL(blobUrl); // Clean up the blob URL
+    } catch (error) {
+      console.error('Error sharing:', error);
+      toast.error("Failed to share betslip");
+    }
+  };
+
+  // Share on specific platforms
+  const shareOnSocialMedia = (platform: 'facebook' | 'twitter' | 'email' | 'sms') => {
+    try {
+      let shareUrl = '';
+      const pageUrl = window.location.href;
+      const shareText = "Check out my betslip!";
+      
+      switch (platform) {
+        case 'facebook':
+          shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`;
+          break;
+        case 'twitter':
+          shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(pageUrl)}&text=${encodeURIComponent(shareText)}`;
+          break;
+        case 'email':
+          shareUrl = `mailto:?subject=${encodeURIComponent(shareText)}&body=${encodeURIComponent(shareText + '\n\n' + pageUrl)}`;
+          break;
+        case 'sms':
+          shareUrl = `sms:?body=${encodeURIComponent(shareText + ' ' + pageUrl)}`;
+          break;
       }
       
-      const buttons = document.getElementById('my-share-buttons-container');
-      if (buttons) {
-        buttons.innerHTML = '';
+      // Open in new window/tab
+      if (shareUrl) {
+        window.open(shareUrl, '_blank', 'noopener,noreferrer');
       }
-    };
-  }, [imageUrl]);
+    } catch (error) {
+      console.error('Error sharing on platform:', error);
+      toast.error(`Failed to share on ${platform}`);
+    }
+  };
+
+  const downloadImage = () => {
+    // Create a download link and click it
+    const a = document.createElement('a');
+    a.href = imageUrl;
+    a.download = 'betslip.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    toast.success("Image downloaded successfully");
+  };
 
   return (
     <div className="mt-4 mb-4">
       <h3 className="text-sm font-medium mb-2">Share your betslip:</h3>
-      <div id="my-share-buttons-container"></div>
       
-      {/* Add a direct download link as an alternative */}
-      <div className="mt-2 text-xs text-center text-gray-500">
-        <p>
-          If sharing doesn't work, you can still 
-          <a 
-            href={imageUrl} 
-            download="betslip.png" 
-            className="text-bet365-green ml-1 hover:underline"
-          >
-            download the image
-          </a> 
-          and share it manually.
-        </p>
+      <div className="flex flex-wrap justify-center gap-2 mb-3">
+        {/* Native share button (primarily for mobile) */}
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={handleNativeShare}
+          className="flex items-center gap-1"
+        >
+          <Share className="h-4 w-4" />
+          <span>Share</span>
+        </Button>
+        
+        {/* Social media buttons */}
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={() => shareOnSocialMedia('facebook')}
+          className="flex items-center gap-1 bg-[#1877F2] text-white hover:bg-[#0E65D9]"
+        >
+          <Facebook className="h-4 w-4" />
+          <span>Facebook</span>
+        </Button>
+        
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={() => shareOnSocialMedia('twitter')}
+          className="flex items-center gap-1 bg-[#1DA1F2] text-white hover:bg-[#0C85D0]"
+        >
+          <Twitter className="h-4 w-4" />
+          <span>Twitter</span>
+        </Button>
+        
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={() => shareOnSocialMedia('email')}
+          className="flex items-center gap-1"
+        >
+          <Mail className="h-4 w-4" />
+          <span>Email</span>
+        </Button>
+        
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={() => shareOnSocialMedia('sms')}
+          className="flex items-center gap-1"
+        >
+          <MessageSquare className="h-4 w-4" />
+          <span>SMS</span>
+        </Button>
+      </div>
+      
+      {/* Direct download link as fallback */}
+      <div className="mt-2 text-center">
+        <Button 
+          variant="link" 
+          size="sm" 
+          onClick={downloadImage}
+          className="text-bet365-green hover:text-bet365-green/80"
+        >
+          Download image
+        </Button>
       </div>
     </div>
   );
