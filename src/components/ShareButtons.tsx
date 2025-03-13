@@ -5,8 +5,25 @@ interface ShareButtonsProps {
   imageUrl: string;
 }
 
+// Add type definition for the ShareThis library
+declare global {
+  interface Window {
+    __sharethis__: {
+      load: (product: string, options: any) => void;
+    };
+  }
+}
+
 const ShareButtons: React.FC<ShareButtonsProps> = ({ imageUrl }) => {
   useEffect(() => {
+    // Convert data URL to a publicly accessible URL if needed
+    // For ShareThis to work properly, we need to use actual URLs, not data URLs
+    // Since we're using a data URL (which is very long), we'll set the URL to the current page
+    // and use the image for preview only
+    
+    const shareUrl = window.location.href;
+    const shareTitle = "Check out my betslip!";
+    
     // Check if ShareThis is already initialized
     if (window.__sharethis__) {
       window.__sharethis__.load('inline-share-buttons', {
@@ -19,9 +36,10 @@ const ShareButtons: React.FC<ShareButtonsProps> = ({ imageUrl }) => {
         networks: ['facebook', 'twitter', 'whatsapp', 'email', 'sms', 'sharethis'],
         size: 32,
         show_mobile_buttons: true,
-        url: imageUrl,
-        image: imageUrl,
-        description: 'Check out my betslip!'
+        url: shareUrl, // Use the page URL instead of the image data URL
+        title: shareTitle,
+        description: 'Check out my betslip!',
+        image: imageUrl // Keep the image for preview
       });
       return;
     }
@@ -42,9 +60,10 @@ const ShareButtons: React.FC<ShareButtonsProps> = ({ imageUrl }) => {
           networks: ['facebook', 'twitter', 'whatsapp', 'email', 'sms', 'sharethis'],
           size: 32,
           show_mobile_buttons: true,
-          url: imageUrl,
-          image: imageUrl,
-          description: 'Check out my betslip!'
+          url: shareUrl, // Use the page URL instead of the image data URL
+          title: shareTitle,
+          description: 'Check out my betslip!',
+          image: imageUrl // Keep the image for preview
         });
       }
     };
