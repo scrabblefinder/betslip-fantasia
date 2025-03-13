@@ -1,10 +1,10 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Download, Share, Loader2 } from "lucide-react";
+import { Download, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import ShareButtons from './ShareButtons';
 import {
   BetslipData,
   formatDate,
@@ -16,7 +16,6 @@ import {
   getMarketDisplayText,
   getBookmakerDisplayName,
   formatOdds,
-  generateBetslipImage
 } from "@/utils/betslipGenerator";
 
 interface BetslipPreviewProps {
@@ -25,8 +24,6 @@ interface BetslipPreviewProps {
 
 const BetslipPreview: React.FC<BetslipPreviewProps> = ({ betslip }) => {
   const [isDownloading, setIsDownloading] = useState(false);
-  const [showShareButtons, setShowShareButtons] = useState(false);
-  const [imageUrl, setImageUrl] = useState<string>('');
   
   const totalOdds = calculateTotalOdds(betslip.selections);
   const totalReturns = calculateReturns(betslip.stake, totalOdds);
@@ -42,17 +39,6 @@ const BetslipPreview: React.FC<BetslipPreviewProps> = ({ betslip }) => {
       toast.error("Failed to download betslip");
     } finally {
       setIsDownloading(false);
-    }
-  };
-  
-  const handleShare = async () => {
-    try {
-      const dataUrl = await generateBetslipImage('betslip-preview');
-      setImageUrl(dataUrl);
-      setShowShareButtons(true);
-    } catch (error) {
-      console.error('Share error:', error);
-      toast.error("Failed to prepare betslip for sharing");
     }
   };
 
@@ -82,25 +68,8 @@ const BetslipPreview: React.FC<BetslipPreviewProps> = ({ betslip }) => {
                   </>
                 )}
               </Button>
-              
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleShare}
-                className="flex items-center gap-1"
-              >
-                <Share className="h-4 w-4" />
-                <span>Share</span>
-              </Button>
             </div>
           </div>
-          
-          {/* ShareThis buttons */}
-          {showShareButtons && imageUrl && (
-            <div className="mb-4 animate-fade-in">
-              <ShareButtons imageUrl={imageUrl} />
-            </div>
-          )}
           
           <div className="bg-white">
             <CustomBetslipPreview betslip={betslip} totalOdds={totalOdds} totalReturns={totalReturns} />

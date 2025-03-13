@@ -7,7 +7,6 @@ import { Separator } from '@/components/ui/separator';
 import { 
   Edit, 
   CreditCard, 
-  Share2, 
   Download, 
   Plus, 
   CalendarClock, 
@@ -105,12 +104,12 @@ const Index = () => {
                 <CardContent className="p-6">
                   <div className="flex items-center gap-4 mb-4">
                     <div className="bg-soft-green p-3 rounded-full">
-                      <Share2 className="h-6 w-6 text-bet365-green" />
+                      <Download className="h-6 w-6 text-bet365-green" />
                     </div>
-                    <h3 className="font-semibold text-lg">3. Share or Download</h3>
+                    <h3 className="font-semibold text-lg">3. Download Your Betslip</h3>
                   </div>
                   <p className="text-gray-600">
-                    Download your betslip as an image or share it directly to social media platforms like Facebook, Twitter, or WhatsApp.
+                    Download your betslip as an image to share with friends or save for your records.
                   </p>
                   <div className="mt-4 flex items-center gap-2 text-sm text-gray-500">
                     <Download className="h-4 w-4" />
