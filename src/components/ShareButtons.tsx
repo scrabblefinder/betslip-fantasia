@@ -33,7 +33,7 @@ const ShareButtons: React.FC<ShareButtonsProps> = ({ imageUrl }) => {
         }
       } else {
         // Fallback for browsers that don't support Web Share API
-        toast.info("Direct sharing not supported in this browser. You can download the image instead.");
+        toast.info("Direct sharing not supported in this browser. You can use one of the social media buttons instead.");
       }
     } catch (error) {
       console.error('Error sharing:', error);
@@ -47,7 +47,7 @@ const ShareButtons: React.FC<ShareButtonsProps> = ({ imageUrl }) => {
     return await response.blob();
   };
 
-  // Share on specific platforms by downloading or opening the image
+  // Share on specific platforms by opening the sharing dialog directly
   const shareOnSocialMedia = async (platform: 'facebook' | 'twitter' | 'email' | 'sms') => {
     try {
       // First create a blob URL from the data URL for better compatibility
@@ -56,45 +56,40 @@ const ShareButtons: React.FC<ShareButtonsProps> = ({ imageUrl }) => {
       
       let shareUrl = '';
       const shareText = "Check out my betslip!";
+      const windowFeatures = 'width=600,height=400,menubar=no,toolbar=no,status=no,resizable=yes,scrollbars=yes';
       
       switch (platform) {
         case 'facebook':
-          // Facebook doesn't directly support image sharing via URL parameters
-          // Instead we open Facebook sharing dialog
-          shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`;
-          window.open(shareUrl, '_blank', 'width=600,height=400');
-          toast.info("Please manually upload the image from your downloads");
-          // Download the image for the user to upload manually
-          downloadImage(blobUrl, 'betslip.png');
+          // Facebook sharing
+          shareUrl = `https://www.facebook.com/dialog/share?app_id=966242223397117&display=popup&href=${encodeURIComponent(window.location.href)}&redirect_uri=${encodeURIComponent(window.location.href)}`;
+          window.open(shareUrl, '_blank', windowFeatures);
+          toast.info("Facebook doesn't support direct image sharing. Please copy and paste the image manually.");
           break;
           
         case 'twitter':
-          // Twitter also doesn't support direct image sharing via URL
-          shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
-          window.open(shareUrl, '_blank', 'width=600,height=400');
-          toast.info("Please manually upload the image from your downloads");
-          // Download the image for the user to upload manually
-          downloadImage(blobUrl, 'betslip.png');
+          // Twitter/X sharing
+          shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(window.location.href)}`;
+          window.open(shareUrl, '_blank', windowFeatures);
+          toast.info("Twitter doesn't support direct image sharing. Please copy and paste the image manually.");
           break;
           
         case 'email':
-          // For email, we can create a mailto link (but can't attach the image)
-          shareUrl = `mailto:?subject=${encodeURIComponent(shareText)}&body=${encodeURIComponent(shareText)}`;
+          // For email, create a mailto link with a message
+          shareUrl = `mailto:?subject=${encodeURIComponent(shareText)}&body=${encodeURIComponent(shareText + '\n\n' + window.location.href)}`;
           window.location.href = shareUrl;
-          // Download the image for the user to attach manually
-          downloadImage(blobUrl, 'betslip.png');
-          toast.info("Please attach the downloaded image to your email");
+          toast.info("Please attach the image manually to your email");
           break;
           
         case 'sms':
-          // For SMS, we can only send text
-          shareUrl = `sms:?body=${encodeURIComponent(shareText)}`;
+          // For SMS, create an sms link with the message
+          shareUrl = `sms:?body=${encodeURIComponent(shareText + ' ' + window.location.href)}`;
           window.location.href = shareUrl;
-          // Download the image as the user will need to share it separately
-          downloadImage(blobUrl, 'betslip.png');
-          toast.info("Please attach the downloaded image to your message");
+          toast.info("Please attach the image manually to your message");
           break;
       }
+      
+      // Clean up blob URL
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
       
     } catch (error) {
       console.error('Error sharing on platform:', error);
