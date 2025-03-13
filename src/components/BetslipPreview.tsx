@@ -50,7 +50,12 @@ const BetslipPreview: React.FC<BetslipPreviewProps> = ({ betslip }) => {
     try {
       const dataUrl = await generateBetslipImage('betslip-preview');
       setImageUrl(dataUrl);
-      setShowShareButtons(!showShareButtons);
+      setShowShareButtons(true);
+      
+      if (!showShareButtons) {
+        // First time clicking share, show toast
+        toast.info("Social share options loaded below");
+      }
     } catch (error) {
       console.error('Share error:', error);
       toast.error("Failed to prepare betslip for sharing");
